@@ -1,38 +1,278 @@
-<!DOCTYPE html>
+<?php
+/* ============================================================
+   ANN RETAIL SHOP — Single-file Mobile-first Website
+   File: index.php
+   PHP 7.4+
+   ------------------------------------------------------------
+   Quick start:
+   1) Put this file on your hosting as index.php
+   2) Edit $SITE and $SMTP settings below
+   3) (Optional) Add your Titan SMTP password, then test the form
+   ============================================================ */
+
+session_start();
+
+/* --- SITE SETTINGS ---------------------------------------- */
+$SITE = [
+    'name'       => 'ANN RETAIL SHOP',
+    'tagline'    => 'Everyday essentials • Fair prices • Friendly service',
+    'phone_human' => '+256 700 000 000',        // visible on site
+    'phone_call' => '+256700000000',           // tel: link (no spaces)
+    'whatsapp'   => '256700000000',            // WhatsApp intl format (no +)
+    'email'      => 'sales@annretailshop.philltechs.com',
+    'address'    => 'Kampala, Uganda',
+    'lat'        => 0.288835138082504,
+    'lng'        => 32.6322174072266,
+    'hours'      => 'Mon–Sun: 7:00am – 10:00pm',
+    // If you already have a logo image, place it in same folder and set:
+    'logo'       => '', // e.g. 'logo.png' (leave empty to use text logo)
+];
+
+/* --- (OPTIONAL) TITAN SMTP SETTINGS ----------------------- */
+$SMTP = [
+    'enabled' => false,                             // <- set true to use SMTP
+    'host'    => 'smtp.titan.email',
+    'port'    => 587,
+    'secure'  => 'tls',                             // tls or ssl
+    'user'    => 'sales@annretailshop.philltechs.com',
+    'pass'    => ''                                 // <<< PUT TITAN PASSWORD HERE
+];
+
+/* --- SIMPLE UTILITIES ------------------------------------- */
+function h($s)
+{
+    return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+function make_csrf()
+{
+    if (empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(16));
+    return $_SESSION['csrf'];
+}
+function check_csrf($t)
+{
+    return isset($_SESSION['csrf']) && hash_equals($_SESSION['csrf'], $t ?? '');
+}
+
+function write_lead_csv($row)
+{
+    $file = __DIR__ . '/leads.csv';
+    $isNew = !file_exists($file);
+    $fh = fopen($file, 'a');
+    if ($isNew) {
+        fputcsv($fh, ['timestamp', 'name', 'phone', 'email', 'message', 'ip', 'ua']);
+    }
+    fputcsv($fh, $row);
+    fclose($fh);
+}
+
+/* --- LIGHTWEIGHT SMTP MAILER (AUTH LOGIN + STARTTLS) ------ */
+/* Not as feature-rich as PHPMailer, but good for a single-file site. */
+function send_smtp($smtp, $fromEmail, $fromName, $toEmail, $subject, $html, $alt = '')
+{
+    $host = $smtp['host'];
+    $port = $smtp['port'];
+    $secure = $smtp['secure'];
+    $user = $smtp['user'];
+    $pass = $smtp['pass'];
+
+    $timeout = 30;
+    $remote  = ($secure === 'ssl' ? "ssl://$host" : $host) . ":$port";
+    $fp = @stream_socket_client($remote, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT);
+    if (!$fp) return [false, "Connect error: $errstr ($errno)"];
+
+    stream_set_timeout($fp, $timeout);
+    $read = function () use ($fp) {
+        return fgets($fp, 515);
+    };
+    $send = function ($cmd) use ($fp) {
+        fputs($fp, $cmd . "\r\n");
+    };
+
+    $resp = $read();
+    if (strpos($resp, '220') !== 0) return [false, "Bad banner: $resp"];
+
+    $send("EHLO annretailshop.local");
+    $cap = '';
+    for ($i = 0; $i < 20; $i++) {
+        $line = $read();
+        $cap .= $line;
+        if (substr($line, 3, 1) !== '-') break;
+    }
+
+    if ($secure === 'tls') {
+        $send("STARTTLS");
+        $resp = $read();
+        if (strpos($resp, '220') !== 0) return [false, "STARTTLS failed: $resp"];
+        if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+            return [false, "TLS negotiation failed"];
+        }
+        // re-EHLO after TLS
+        $send("EHLO annretailshop.local");
+        for ($i = 0; $i < 20; $i++) {
+            $line = $read();
+            if (substr($line, 3, 1) !== '-') break;
+        }
+    }
+
+    $send("AUTH LOGIN");
+    $resp = $read();
+    if (strpos($resp, '334') !== 0) return [false, "AUTH step1: $resp"];
+    $send(base64_encode($user));
+    $resp = $read();
+    if (strpos($resp, '334') !== 0) return [false, "AUTH step2: $resp"];
+    $send(base64_encode($pass));
+    $resp = $read();
+    if (strpos($resp, '235') !== 0) return [false, "AUTH step3: $resp"];
+
+    $send("MAIL FROM:<$fromEmail>");
+    $resp = $read();
+    if (strpos($resp, '250') !== 0) return [false, "MAIL FROM: $resp"];
+    $send("RCPT TO:<$toEmail>");
+    $resp = $read();
+    if (strpos($resp, '250') !== 0 && strpos($resp, '251') !== 0) return [false, "RCPT TO: $resp"];
+    $send("DATA");
+    $resp = $read();
+    if (strpos($resp, '354') !== 0) return [false, "DATA: $resp"];
+
+    $boundary = "bnd_" . bin2hex(random_bytes(6));
+    $headers = [];
+    $headers[] = "From: $fromName <$fromEmail>";
+    $headers[] = "To: <$toEmail>";
+    $headers[] = "Subject: $subject";
+    $headers[] = "MIME-Version: 1.0";
+    $headers[] = "Content-Type: multipart/alternative; boundary=\"$boundary\"";
+    $headers[] = "X-Mailer: SimpleSMTP/1.0";
+
+    $body  = "--$boundary\r\n";
+    $body .= "Content-Type: text/plain; charset=UTF-8\r\n\r\n";
+    $body .= ($alt ?: strip_tags(str_replace(["<br>", "<br/>", "<br />"], "\n", $html))) . "\r\n";
+    $body .= "\r\n--$boundary\r\n";
+    $body .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
+    $body .= $html . "\r\n";
+    $body .= "\r\n--$boundary--\r\n";
+
+    $data = implode("\r\n", $headers) . "\r\n\r\n" . $body . "\r\n.";
+    fputs($fp, $data . "\r\n");
+    $resp = $read();
+    if (strpos($resp, '250') !== 0) return [false, "Body send: $resp"];
+
+    $send("QUIT");
+    fclose($fp);
+    return [true, "OK"];
+}
+
+/* --- MAIL DISPATCHER -------------------------------------- */
+function send_mail($SMTP, $fromEmail, $fromName, $toEmail, $subject, $html, $alt = '')
+{
+    if ($SMTP['enabled'] && !empty($SMTP['pass'])) {
+        return send_smtp($SMTP, $fromEmail, $fromName, $toEmail, $subject, $html, $alt);
+    } else {
+        // Try PHP mail() and return a friendly status
+        $headers = "MIME-Version: 1.0\r\n" .
+            "Content-type: text/html; charset=UTF-8\r\n" .
+            "From: $fromName <$fromEmail>\r\n";
+        $ok = @mail($toEmail, $subject, $html, $headers);
+        return [$ok, $ok ? "OK (mail())" : "mail() failed or disabled on host"];
+    }
+}
+
+/* --- HANDLE FORM SUBMISSION ------------------------------- */
+$flash = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf = $_POST['csrf'] ?? '';
+    $hp   = $_POST['website'] ?? ''; // honeypot
+    $name = trim($_POST['name'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $msg  = trim($_POST['message'] ?? '');
+
+    if (!$hp && check_csrf($csrf) && $name && ($phone || $email) && $msg) {
+        // Save lead
+        write_lead_csv([
+            date('c'),
+            $name,
+            $phone,
+            $email,
+            $msg,
+            $_SERVER['REMOTE_ADDR'] ?? '',
+            $_SERVER['HTTP_USER_AGENT'] ?? ''
+        ]);
+
+        // Build email
+        $sub = "New Inquiry • " . $SITE['name'];
+        $html = "<h2>New Inquiry from {$SITE['name']}</h2>
+            <p><strong>Name:</strong> " . h($name) . "</p>
+            <p><strong>Phone:</strong> " . h($phone) . "</p>
+            <p><strong>Email:</strong> " . h($email) . "</p>
+            <p><strong>Message:</strong><br>" . nl2br(h($msg)) . "</p>
+            <hr><p>Time: " . h(date('r')) . "<br>IP: " . h($_SERVER['REMOTE_ADDR'] ?? '') . "</p>";
+
+        [$ok, $info] = send_mail(
+            $GLOBALS['SMTP'],
+            $SITE['email'],
+            $SITE['name'],
+            $SITE['email'],
+            $sub,
+            $html
+        );
+
+        $flash = $ok ? ['ok', "Thanks $name! We’ve received your message. We’ll get back soon."]
+            : ['warn', "Saved your message, but email didn’t send: $info"];
+    } else {
+        $flash = ['err', "Please fill in the required fields correctly."];
+    }
+}
+
+/* --- CSRF TOKEN FOR FORM --------------------------------- */
+$csrfToken = make_csrf();
+?>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ANN RETAIL SHOP | Everyday Essentials at Great Prices</title>
-    <meta name="description" content="ANN RETAIL SHOP — your neighbourhood store for groceries, household items, personal care, and more. Order, call, or visit us today!" />
-    <meta name="theme-color" content="#f97316" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title><?= h($SITE['name']) ?> — Kampala Retail Shop</title>
+    <meta name="description" content="ANN RETAIL SHOP • Everyday essentials, fair prices, fast service in Kampala. Groceries, household, beauty, baby items & more.">
 
-    <!-- SEO / Social -->
-    <meta property="og:title" content="ANN RETAIL SHOP" />
-    <meta property="og:description" content="Everyday essentials at great prices. Call, WhatsApp, or visit us today." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://annretailshop.com/" />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1585386959984-a41552231658?q=80&w=1600&auto=format&fit=crop" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <!-- Colors -->
+    <meta name="theme-color" content="#ff7a1a">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-
-    <!-- Favicon (placeholder) -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230ea5e9'/%3E%3Ctext x='50' y='58' font-size='58' text-anchor='middle' fill='white' font-family='Arial, Helvetica, sans-serif'%3EA%3C/text%3E%3C/svg%3E" />
+    <!-- Leaflet Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="" crossorigin="" />
 
     <style>
         :root {
-            --brand: #f97316;
-            --brand-600: #ea580c;
-            --accent: #10b981;
-            --accent-600: #059669;
+            --brand: #ff7a1a;
+            /* Orange */
+            --mint: #23d3b0;
+            /* Mint green */
             --ink: #0f172a;
-            --muted: #475569;
-            --bg: #f8fafc;
+            /* Deep slate */
+            --text: #111827;
+            --muted: #6b7280;
+            --bg: #ffffff;
+            --soft: #f8fafc;
             --card: #ffffff;
-            --ring: rgba(249, 115, 22, .25)
+            --ring: rgba(255, 122, 26, 0.35);
+            --ok: #059669;
+            --warn: #b45309;
+            --err: #b91c1c;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text: #e5e7eb;
+                --muted: #9ca3af;
+                --bg: #0b0f1a;
+                --soft: #0f1524;
+                --card: #101726;
+                --ink: #e5e7eb;
+                --ring: rgba(35, 211, 176, 0.35);
+            }
         }
 
         * {
@@ -43,882 +283,757 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Inter', system-ui, Segoe UI, Roboto, Arial, sans-serif;
-            color: var(--ink);
-            background: var(--bg)
+            font-family: Inter, system-ui, ui-sans-serif, Segoe UI, Roboto, Arial;
+            background: var(--bg);
+            color: var(--text);
         }
 
-        a {
-            color: inherit;
-            text-decoration: none
-        }
-
-        img {
-            max-width: 100%;
-            display: block
-        }
-
-        .container {
-            max-width: 1180px;
+        /* Layout helpers */
+        .wrap {
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 0 16px
+            padding: clamp(14px, 3vw, 22px);
         }
 
-        /* Header */
+        .grid {
+            display: grid;
+            gap: clamp(14px, 2.5vw, 22px);
+        }
+
+        .g2 {
+            grid-template-columns: repeat(2, 1fr)
+        }
+
+        .g3 {
+            grid-template-columns: repeat(3, 1fr)
+        }
+
+        .g4 {
+            grid-template-columns: repeat(4, 1fr)
+        }
+
+        @media (max-width:900px) {
+
+            .g3,
+            .g4 {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        @media (max-width:640px) {
+
+            .g2,
+            .g3,
+            .g4 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* Header / Nav */
         header {
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(255, 255, 255, .9);
-            backdrop-filter: saturate(180%) blur(10px);
-            border-bottom: 1px solid #eef2f7
+            background: var(--bg);
+            border-bottom: 1px solid rgba(0, 0, 0, .06);
         }
 
         .nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 0
+            gap: 12px;
+            padding: 10px clamp(14px, 3vw, 22px);
         }
 
         .brand {
             display: flex;
-            gap: 12px;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            letter-spacing: .4px
+        }
+
+        .brand .logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(circle at 30% 30%, var(--mint), var(--brand));
+            color: #fff;
+            font-weight: 900
+        }
+
+        .brand span {
+            font-size: 18px
+        }
+
+        .menu-btn {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            padding: 10px 12px;
+            border: 1px solid rgba(0, 0, 0, .08);
+            border-radius: 12px;
+            background: var(--card);
+            cursor: pointer
+        }
+
+        .menu-btn svg {
+            width: 20px;
+            height: 20px
+        }
+
+        .navlinks {
+            display: flex;
+            gap: 16px;
             align-items: center
         }
 
-        .brand img.logo {
-            height: 40px;
-            width: 40px;
-            border-radius: 12px;
-            box-shadow: 0 6px 16px rgba(2, 132, 199, .25)
+        .navlinks a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 10px;
+            border-radius: 10px
         }
 
-        .brand .name {
-            font-weight: 800;
-            letter-spacing: .2px
+        .navlinks a:hover {
+            background: var(--soft)
         }
 
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #d1fae5;
-            color: #065f46;
-            padding: 8px 12px;
-            border-radius: 999px;
-            font-size: 14px;
-            border: 1px solid #a7f3d0
+        @media (max-width:860px) {
+            .navlinks {
+                display: none
+            }
+
+            .menu-panel {
+                display: none;
+                position: absolute;
+                top: 62px;
+                right: 12px;
+                background: var(--card);
+                border: 1px solid rgba(0, 0, 0, .08);
+                border-radius: 14px;
+                padding: 10px;
+                width: min(92vw, 380px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, .18)
+            }
+
+            .menu-panel a {
+                display: block;
+                padding: 12px 10px;
+                border-radius: 10px;
+                text-decoration: none;
+                color: var(--text);
+                font-weight: 600
+            }
+
+            .menu-panel a:hover {
+                background: var(--soft)
+            }
+
+            .menu-panel.show {
+                display: block
+            }
         }
 
-        .actions {
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, rgba(255, 122, 26, .10), rgba(35, 211, 176, .10));
+            border-bottom: 1px solid rgba(0, 0, 0, .06)
+        }
+
+        .hero-wrap {
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+            gap: 24px;
+            align-items: center
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 44px);
+            line-height: 1.05;
+            margin: 8px 0
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: clamp(14px, 2.5vw, 18px)
+        }
+
+        .badges {
             display: flex;
             gap: 10px;
-            align-items: center
+            flex-wrap: wrap;
+            margin-top: 10px
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: var(--card);
+            border: 1px solid rgba(0, 0, 0, .06);
+            font-weight: 600;
+            font-size: 13px
+        }
+
+        .cta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            border: 1px solid #e2e8f0;
-            background: #fff;
-            padding: 10px 14px;
+            padding: 12px 14px;
             border-radius: 12px;
-            font-weight: 600;
-            transition: .2s;
-            box-shadow: 0 1px 0 rgba(15, 23, 42, .02)
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 28px rgba(0, 0, 0, .08)
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(2, 132, 199, .18)
+            text-decoration: none;
+            font-weight: 700;
+            border: 2px solid transparent
         }
 
         .btn.primary {
             background: var(--brand);
-            border-color: var(--brand);
             color: #fff
         }
 
-        .btn.primary:hover {
-            background: var(--brand-600);
-            border-color: var(--brand-600)
+        .btn.mint {
+            background: var(--mint);
+            color: #0c1b15
         }
 
         .btn.ghost {
-            background: transparent
-        }
-
-        .mobile-hide {
-            display: none
-        }
-
-        /* Hero */
-        .hero {
-            position: relative;
-            overflow: hidden
-        }
-
-        .hero:before {
-            content: "";
-            position: absolute;
-            inset: -20% -10% auto -10%;
-            height: 120%;
-            background: radial-gradient(600px 300px at 20% 20%, rgba(249, 115, 22, .18), transparent 60%), radial-gradient(500px 250px at 80% 10%, rgba(16, 185, 129, .18), transparent 60%);
-            filter: blur(10px);
-            z-index: 0
-        }
-
-        .hero .inner {
-            position: relative;
-            z-index: 1
-        }
-
-        .hero .inner {
-            display: grid;
-            grid-template-columns: 1.1fr .9fr;
-            gap: 20px;
-            align-items: center;
-            padding: 28px 0
-        }
-
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 38px;
-            line-height: 1.1;
-            margin: 0 0 10px
-        }
-
-        .hero p {
-            color: var(--muted);
-            font-size: 18px;
-            margin: 0 0 20px
-        }
-
-        .badge {
-            display: inline-flex;
-            gap: 8px;
-            align-items: center;
-            background: #fffbeb;
-            border: 1px solid #fed7aa;
-            color: #9a3412;
-            padding: 8px 12px;
-            border-radius: 999px;
-            font-weight: 600;
-            font-size: 13px
-        }
-
-        .hero-card {
-            background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(2, 132, 199, .12)
-        }
-
-        .hero-visual {
-            position: relative
-        }
-
-        .float {
-            position: absolute;
-            inset: auto;
-            animation: float 6s ease-in-out infinite
-        }
-
-        .float.one {
-            top: 8%;
-            left: -4%;
-        }
-
-        .float.two {
-            bottom: -10%;
-            right: -6%
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0)
-            }
-
-            50% {
-                transform: translateY(-10px)
-            }
-        }
-
-        /* Sections */
-        section {
-            padding: 28px 0
-        }
-
-        .section-title {
-            font-size: 28px;
-            margin: 0 0 8px
-        }
-
-        .section-desc {
-            color: var(--muted);
-            margin: 0 0 24px
-        }
-
-        /* Features */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px
-        }
-
-        .feature {
             background: var(--card);
-            padding: 18px;
-            border-radius: 16px;
-            border: 1px solid #eef2f7;
-            box-shadow: 0 2px 10px rgba(15, 23, 42, .04)
+            border-color: rgba(0, 0, 0, .08);
+            color: var(--text)
         }
 
-        .feature h4 {
-            margin: 10px 0 6px;
-            font-size: 16px
-        }
-
-        .feature p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 14px
-        }
-
-        /* Categories grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px
-        }
-
-        .card {
-            position: relative;
-            overflow: hidden;
+        .hero-img {
+            aspect-ratio: 4/3;
             border-radius: 18px;
-            border: 1px solid #eef2f7;
-            background: var(--card);
-            box-shadow: 0 12px 30px rgba(15, 23, 42, .06)
+            overflow: hidden;
+            background:
+                radial-gradient(600px 220px at 10% 10%, rgba(255, 122, 26, .25), transparent 40%),
+                radial-gradient(600px 220px at 90% 90%, rgba(35, 211, 176, .25), transparent 40%),
+                linear-gradient(135deg, #0b1222, #111a2f);
+            display: grid;
+            place-items: center;
+            color: #c7fff3;
+            font-weight: 800;
+            letter-spacing: .3px
         }
 
-        .card .content {
-            position: absolute;
-            inset: auto 0 0 0;
-            padding: 14px;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, .65) 100%);
-            color: #fff
+        .hero-img small {
+            color: #7bead4;
+            font-weight: 700
         }
 
-        /* Carousel */
-        .carousel {
-            position: relative
-        }
-
-        .track {
+        /* Section headings */
+        .sh {
             display: flex;
-            gap: 16px;
-            overflow: auto;
-            scroll-snap-type: x mandatory;
-            padding-bottom: 8px
-        }
-
-        .track .item {
-            min-width: 280px;
-            scroll-snap-align: start
-        }
-
-        .carousel .nav {
-            position: absolute;
-            inset: -50px 0 auto 0;
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end
-        }
-
-        .icon-btn {
-            border: 1px solid #e2e8f0;
-            background: #fff;
-            padding: 8px 10px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(15, 23, 42, .08)
-        }
-
-        /* CTA band */
-        .cta {
-            background: linear-gradient(90deg, var(--brand), var(--accent));
-            color: #fff;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 12px
+            margin: 18px 0 8px
         }
 
-        /* Contact */
-        .contact {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px
+        .sh h2 {
+            margin: 0;
+            font-size: clamp(20px, 3.2vw, 28px)
         }
 
-        form {
-            background: var(--card);
-            padding: 20px;
-            border: 1px solid #eef2f7;
-            border-radius: 16px;
-            box-shadow: 0 10px 22px rgba(2, 132, 199, .06)
-        }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 12px
-        }
-
-        .field input,
-        .field textarea {
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            outline: none;
-            font-size: 15px;
-            background: #fff
-        }
-
-        .field input:focus,
-        .field textarea:focus {
-            border-color: var(--brand);
-            box-shadow: 0 0 0 4px var(--ring)
-        }
-
-        .hint {
-            font-size: 12px;
+        .sh p {
+            margin: 0;
             color: var(--muted)
         }
 
-        iframe.map {
+        /* Cards */
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(0, 0, 0, .06);
+            border-radius: 16px;
+            overflow: hidden
+        }
+
+        .card .img {
+            aspect-ratio: 1.6/1;
+            background: linear-gradient(135deg, rgba(255, 122, 26, .18), rgba(35, 211, 176, .18));
+            display: block
+        }
+
+        .card .body {
+            padding: 12px
+        }
+
+        .price {
+            font-weight: 800
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        /* Feature list */
+        .feature {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 12px;
+            background: var(--card);
+            border: 1px solid rgba(0, 0, 0, .06);
+            border-radius: 14px
+        }
+
+        .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--mint), var(--brand));
+            color: #fff;
+            font-weight: 900
+        }
+
+        /* Contact / Form */
+        form {
+            display: grid;
+            gap: 10px
+        }
+
+        .fld {
+            display: grid;
+            gap: 6px
+        }
+
+        .fld input,
+        .fld textarea {
             width: 100%;
-            height: 100%;
-            min-height: 360px;
-            border: 0;
-            border-radius: 16px
+            padding: 12px 13px;
+            border-radius: 12px;
+            border: 1.6px solid rgba(0, 0, 0, .12);
+            background: var(--bg);
+            color: var(--text);
+            outline: none;
+            box-shadow: 0 0 0 0px var(--ring);
+        }
+
+        .fld input:focus,
+        .fld textarea:focus {
+            box-shadow: 0 0 0 6px var(--ring);
+            border-color: var(--brand);
+        }
+
+        .fld small {
+            color: var(--muted)
+        }
+
+        .hint {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600
+        }
+
+        .alert.ok {
+            background: rgba(5, 150, 105, .12);
+            color: #d1fae5;
+            border: 1px solid rgba(5, 150, 105, .35)
+        }
+
+        .alert.warn {
+            background: rgba(180, 83, 9, .12);
+            color: #fde68a;
+            border: 1px solid rgba(180, 83, 9, .35)
+        }
+
+        .alert.err {
+            background: rgba(185, 28, 28, .12);
+            color: #fecaca;
+            border: 1px solid rgba(185, 28, 28, .35)
+        }
+
+        @media (prefers-color-scheme: light) {
+            .alert.ok {
+                color: #065f46;
+                background: #ecfdf5
+            }
+
+            .alert.warn {
+                color: #92400e;
+                background: #fffbeb
+            }
+
+            .alert.err {
+                color: #991b1b;
+                background: #fef2f2
+            }
+        }
+
+        /* Map */
+        #map {
+            height: 320px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, .08);
+            overflow: hidden
         }
 
         /* Footer */
         footer {
-            padding: 24px 0;
-            border-top: 1px solid #eef2f7;
-            color: var(--muted);
-            font-size: 14px
+            margin-top: 30px;
+            padding: 30px 0;
+            background: var(--soft);
+            border-top: 1px solid rgba(0, 0, 0, .06);
+            color: var(--muted)
         }
 
-        /* Utilities */
-        .row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap
+        /* Sticky mobile action bar */
+        .mbar {
+            position: sticky;
+            bottom: 0;
+            z-index: 40;
+            background: var(--card);
+            border-top: 1px solid rgba(0, 0, 0, .08);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
         }
 
-        .tag {
-            background: #e2e8f0;
-            color: #0f172a;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-weight: 600;
+        .mbar a {
+            display: grid;
+            place-items: center;
+            padding: 12px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 700
+        }
+
+        .mbar a span {
             font-size: 12px
         }
 
-        .shadow-pop {
-            animation: pop .6s ease-out
+        .mbar a.primary {
+            background: var(--brand);
+            color: #fff
         }
 
-        @keyframes pop {
-            0% {
-                transform: scale(.96);
-                opacity: .6
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 960px) {
-            .hero .inner {
-                grid-template-columns: 1fr;
-                gap: 14px;
-                padding: 22px 0
-            }
-
-            .features {
-                grid-template-columns: repeat(2, 1fr)
-            }
-
-            .grid {
-                grid-template-columns: repeat(2, 1fr)
-            }
-
-            .contact {
-                grid-template-columns: 1fr
-            }
-
-            .actions {
-                display: none
-            }
-
-            .mstrip {
-                display: block
-            }
-        }
-
-        @media (min-width: 961px) {
-            .mobile-hide {
-                display: inline-flex
-            }
-        }
-
-        .features {
-            grid-template-columns: repeat(2, 1fr)
-        }
-
-        .grid {
-            grid-template-columns: repeat(2, 1fr)
-        }
-
-        .contact {
-            grid-template-columns: 1fr
-        }
-
-        .mobile-hide {
-            display: none
-        }
-
-
-        @media (min-width: 961px) {
-            .mobile-hide {
-                display: inline-flex
-            }
-        }
-
-        /* Mobile action strip */
-        .mstrip {
-            display: none;
-            border-bottom: 1px solid #eef2f7;
-            background: #fff
-        }
-
-        .mstrip .container {
-            display: flex;
-            gap: 8px;
-            overflow: auto;
-            padding: 8px 16px
-        }
-
-        .mstrip .btn {
-            flex: 1;
-            white-space: nowrap;
-            justify-content: center
+        .mbar a.mint {
+            background: var(--mint);
+            color: #0c1b15
         }
     </style>
 </head>
 
 <body>
+
     <header>
-        <div class="container nav">
+        <div class="nav">
             <div class="brand">
-                <!-- Replace this taste image with your real logo (square recommended) -->
-                <img class="logo" alt="ANN Retail Shop logo" src="https://images.unsplash.com/photo-1526403226243-67b9d8bd22d9?q=80&w=256&auto=format&fit=crop" />
-                <div>
-                    <div class="name">ANN RETAIL SHOP</div>
-                    <div class="pill" title="Open 7 days a week">Open • 7:00am – 9:30pm</div>
-                </div>
+                <?php if ($SITE['logo']): ?>
+                    <img src="<?= h($SITE['logo']) ?>" alt="<?= h($SITE['name']) ?> logo" width="38" height="38" style="border-radius:10px;object-fit:cover">
+                <?php else: ?>
+                    <div class="logo">AR</div>
+                <?php endif; ?>
+                <span><?= h($SITE['name']) ?></span>
             </div>
-            <div class="actions">
-                <a class="btn ghost mobile-hide" href="https://wa.me/256746825914" target="_blank" rel="noopener">WhatsApp</a>
-                <a class="btn" href="#contact">Call / Visit</a>
-                <a class="btn primary" href="#order">Order Now</a>
+            <nav class="navlinks">
+                <a href="#shop">Shop</a>
+                <a href="#deals">Deals</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </nav>
+            <button class="menu-btn" id="menuBtn" aria-label="Open Menu">
+                <!-- burger icon -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 6h18M3 12h18M3 18h18" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                Menu
+            </button>
+            <div class="menu-panel" id="menuPanel">
+                <a href="#shop">Shop</a>
+                <a href="#deals">Deals</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+                <a href="tel:<?= h($SITE['phone_call']) ?>">Call us: <?= h($SITE['phone_human']) ?></a>
             </div>
         </div>
     </header>
-    <div class="mstrip">
-        <div class="container">
-            <a class="btn" href="#catalog">Categories</a>
-            <a class="btn" href="#order">Order</a>
-            <a class="btn" href="#contact">Contact</a>
-            <a class="btn" href="https://wa.me/256746825914" target="_blank" rel="noopener">WhatsApp</a>
-        </div>
-    </div>
 
     <main>
-        <!-- Hero -->
+
+        <!-- HERO -->
         <section class="hero">
-            <div class="container inner">
+            <div class="wrap hero-wrap">
                 <div>
-                    <span class="badge shadow-pop">Everyday essentials • Fast service • Friendly prices</span>
-                    <h1>Welcome to <span style="color:var(--brand)">ANN RETAIL SHOP</span><br />Your neighbourhood store for all essentials.</h1>
-                    <p>Fresh groceries, home & cleaning, personal care, snacks & beverages, baby needs, and more. Shop in‑store or order by phone / WhatsApp — we deliver around town.</p>
-                    <div class="row">
-                        <a class="btn primary" href="#order">Order on WhatsApp</a>
-                        <a class="btn" href="#catalog">Browse Categories</a>
+                    <div class="badge">Kampala • Open daily</div>
+                    <h1><?= h($SITE['name']) ?></h1>
+                    <p><?= h($SITE['tagline']) ?></p>
+                    <div class="badges">
+                        <div class="badge">Groceries</div>
+                        <div class="badge">Household</div>
+                        <div class="badge">Beauty</div>
+                        <div class="badge">Baby</div>
+                        <div class="badge">Snacks</div>
                     </div>
-                    <div class="row" style="margin-top:10px">
-                        <span class="tag">Deals updated weekly</span>
-                        <span class="tag">Mobile payments accepted</span>
-                        <span class="tag">Return policy: 48 hours</span>
+                    <div class="cta">
+                        <a class="btn primary" href="#shop">Browse Items</a>
+                        <a class="btn mint" href="https://wa.me/<?= h($SITE['whatsapp']) ?>?text=Hello%20ANN%20RETAIL%20SHOP%2C%20I%27d%20like%20to%20order.">WhatsApp Order</a>
+                        <a class="btn ghost" href="tel:<?= h($SITE['phone_call']) ?>">Call <?= h($SITE['phone_human']) ?></a>
                     </div>
                 </div>
-                <div class="hero-visual">
-                    <div class="hero-card">
-                        <img alt="Retail aisle" src="https://www.marketing91.com/wp-content/uploads/2018/01/Types-of-Retail-Stores-2.jpg" />
-                    </div>
-                    <img class="float one" style="width:160px" alt="groceries" src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600&auto=format&fit=crop" />
-                    <img class="float two" style="width:220px" alt="basket" src="https://images.unsplash.com/photo-1597074866923-02c5d9b3327e?q=80&w=800&auto=format&fit=crop" />
-                </div>
-            </div>
-        </section>
-
-        <!-- Trust features -->
-        <section>
-            <div class="container">
-                <h3 class="section-title">Why shop with us</h3>
-                <p class="section-desc">We keep it simple: quality products, fair prices, and fast friendly service.</p>
-                <div class="features">
-                    <div class="feature"><strong>Fair Prices</strong>
-                        <p>Transparent pricing and regular promos.</p>
-                    </div>
-                    <div class="feature"><strong>Fresh Stock</strong>
-                        <p>Frequent restocks on top sellers.</p>
-                    </div>
-                    <div class="feature"><strong>Multiple Payments</strong>
-                        <p>Cash, Mobile Money, card (where available).</p>
-                    </div>
-                    <div class="feature"><strong>Local Delivery</strong>
-                        <p>WhatsApp to order; we deliver around town.</p>
+                <div class="hero-img">
+                    <div style="text-align:center">
+                        <div style="font-size:40px;line-height:.95">SHOP • SAVE • SMILE</div>
+                        <small>Tip: replace this with your shop photo</small>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Categories -->
-        <section id="catalog">
-            <div class="container">
-                <h3 class="section-title">Popular categories</h3>
-                <p class="section-desc">A quick look at our most requested items.</p>
-                <div class="grid">
-                    <a class="card" href="#order"><img alt="Groceries" src="https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=1200&auto=format&fit=crop">
-                        <div class="content"><strong>Groceries</strong>
-                            <div>Rice, flour, sugar, beans…</div>
-                        </div>
-                    </a>
-                    <a class="card" href="#order"><img alt="Beverages" src="https://images.unsplash.com/photo-1559718062-361155fad299?q=80&w=1200&auto=format&fit=crop">
-                        <div class="content"><strong>Beverages</strong>
-                            <div>Juice, water, soda, tea…</div>
-                        </div>
-                    </a>
-                    <a class="card" href="#order"><img alt="Personal care" src="https://images.unsplash.com/photo-1556228453-efd1e7f49b8f?q=80&w=1200&auto=format&fit=crop">
-                        <div class="content"><strong>Personal Care</strong>
-                            <div>Soaps, toothpaste, lotion…</div>
-                        </div>
-                    </a>
-                    <a class="card" href="#order"><img alt="Cleaning" src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1200&auto=format&fit=crop">
-                        <div class="content"><strong>Home & Cleaning</strong>
-                            <div>Detergents, tissues…</div>
-                        </div>
-                    </a>
-                </div>
+        <!-- CATEGORIES / FEATURED -->
+        <section id="shop" class="wrap">
+            <div class="sh">
+                <h2>Popular Picks</h2>
+                <p>Fresh staples & everyday needs</p>
+            </div>
+            <div class="grid g4">
+                <?php
+                $items = [
+                    ['Rice (5kg)', 'UGX 28,500', 'Switch image later'],
+                    ['Cooking Oil (3L)', 'UGX 27,000', 'Switch image later'],
+                    ['Sugar (2kg)', 'UGX 9,800', 'Switch image later'],
+                    ['Soap Bar', 'UGX 3,500', 'Switch image later'],
+                    ['Toothpaste', 'UGX 6,500', 'Switch image later'],
+                    ['Baby Diapers', 'UGX 38,000', 'Switch image later'],
+                    ['Tea Bags', 'UGX 5,500', 'Switch image later'],
+                    ['Biscuits', 'UGX 3,000', 'Switch image later'],
+                ];
+                foreach ($items as $i) {
+                    echo '<article class="card">';
+                    echo '  <div class="img"></div>';
+                    echo '  <div class="body">';
+                    echo '    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
+                    echo '      <strong>' . h($i[0]) . '</strong><span class="price">' . h($i[1]) . '</span>';
+                    echo '    </div>';
+                    echo '    <div class="muted" style="margin-top:4px">' . h($i[2]) . '</div>';
+                    echo '    <div style="margin-top:10px;display:flex;gap:8px">';
+                    echo '      <a class="btn mint" style="padding:9px 12px" href="https://wa.me/' . h($SITE['whatsapp']) . '?text=Order:%20' . rawurlencode($i[0]) . '%20(' . rawurlencode($i[1]) . ')">Order</a>';
+                    echo '      <a class="btn ghost" style="padding:9px 12px" href="#contact">Ask</a>';
+                    echo '    </div>';
+                    echo '  </div>';
+                    echo '</article>';
+                }
+                ?>
             </div>
         </section>
 
-        <!-- Best sellers carousel -->
-        <section>
-            <div class="container carousel">
-                <h3 class="section-title">This week's best sellers</h3>
-                <div class="nav">
-                    <button class="icon-btn" id="prevBtn" aria-label="Previous">◀</button>
-                    <button class="icon-btn" id="nextBtn" aria-label="Next">▶</button>
-                </div>
-                <div class="track" id="track">
-                    <div class="item card"><img alt="Cooking oil" src="https://images.unsplash.com/photo-1517260739337-6799d878efca?q=80&w=1200&auto=format&fit=crop">
-                        <div class="content"><strong>Cooking Oil 3L</strong>
-                            <div>Promo price • while stocks last</div>
-                        </div>
-                    </div>
-                    <div class="item card"><img alt="Sugar" src="https://images.unsplash.com/photo-1615485925600-27149fc4d19b?q=80&w=1200&auto=format&fit=crop">
-                        <div class="content"><strong>Sugar 1kg</strong>
-                            <div>High demand</div>
-                        </div>
-                    </div>
-                    <div class="item card"><img alt="Beans" src="https://images.unsplash.com/photo-1607301405394-4a578b865c98?q=80&w=1200&auto=format&fit=crop">
-                        <div class="content"><strong>Beans 1kg</strong>
-                            <div>Fresh stock</div>
-                        </div>
-                    </div>
-                    <div class="item card"><img alt="Rice" src="https://images.unsplash.com/photo-1565688534245-05d6b5be1847?q=80&w=1200&auto=format&fit=crop">
-                        <div class="content"><strong>Rice 5kg</strong>
-                            <div>Customer favourite</div>
-                        </div>
-                    </div>
-                    <div class="item card"><img alt="Toothpaste" src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?q=80&w=1200&auto=format&fit=crop">
-                        <div class="content"><strong>Toothpaste</strong>
-                            <div>Multi‑buy deal</div>
-                        </div>
-                    </div>
-                </div>
+        <!-- DEALS / PROMOS -->
+        <section id="deals" class="wrap">
+            <div class="sh">
+                <h2>Deals of the Week</h2>
+                <p>Save more with bundle offers</p>
             </div>
-        </section>
-
-        <!-- CTA strip -->
-        <section>
-            <div class="container">
-                <div class="cta">
+            <div class="grid g3">
+                <div class="feature">
+                    <div class="icon">%</div>
                     <div>
-                        <strong>Need something now?</strong>
-                        <div>Message us on WhatsApp and we’ll prepare your order.</div>
+                        <strong>Combo: Rice + Oil</strong>
+                        <div class="muted">Bundle & save • Ask at checkout</div>
                     </div>
-                    <div class="row">
-                        <a class="btn" href="https://wa.me/256746825914" target="_blank" rel="noopener">WhatsApp: +256 746 825 914</a>
-                        <a class="btn" href="https://wa.me/256781988570" target="_blank" rel="noopener">WhatsApp: +256 781 988 570</a>
+                </div>
+                <div class="feature">
+                    <div class="icon">★</div>
+                    <div>
+                        <strong>Members get early deals</strong>
+                        <div class="muted">Join our WhatsApp list for weekly offers</div>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="icon">⏱</div>
+                    <div>
+                        <strong>Express pickup</strong>
+                        <div class="muted">Order on WhatsApp, pick in minutes</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- About / Testimonials -->
-        <section>
-            <div class="container">
-                <h3 class="section-title">About ANN RETAIL SHOP</h3>
-                <p class="section-desc">We’re proud to serve our community with reliable stock, neat shelves, and a smile. Our mission is simple: make everyday shopping fast and stress‑free.</p>
-                <div class="grid">
-                    <div class="card" style="padding:18px">
-                        <h4>Customer Reviews</h4>
-                        <p>“Clean shop, fair prices, and the staff are kind.” — <em>Sarah K.</em></p>
-                        <p>“Always find what I need. Quick checkout.” — <em>Moses B.</em></p>
+        <!-- ABOUT / MAP -->
+        <section id="about" class="wrap">
+            <div class="sh">
+                <h2>Find Us</h2>
+                <p><?= h($SITE['address']) ?> • <?= h($SITE['hours']) ?></p>
+            </div>
+            <div id="map"></div>
+        </section>
+
+        <!-- CONTACT -->
+        <section id="contact" class="wrap">
+            <div class="sh">
+                <h2>Order / Contact</h2>
+                <p>We reply quickly during open hours</p>
+            </div>
+
+            <?php if ($flash): ?>
+                <div class="alert <?= $flash[0] ?>"><?= $flash[1] ?></div>
+            <?php endif; ?>
+
+            <div class="grid g2">
+                <form method="post" action="#contact" novalidate>
+                    <input type="hidden" name="csrf" value="<?= h($csrfToken) ?>">
+                    <!-- honeypot -->
+                    <input type="text" name="website" value="" style="display:none!important" tabindex="-1" autocomplete="off">
+                    <div class="fld">
+                        <label for="name">Your name *</label>
+                        <input id="name" name="name" required placeholder="e.g. Jane Doe">
                     </div>
-                    <div class="card" style="padding:18px">
-                        <h4>Store Highlights</h4>
-                        <ul>
-                            <li>Open daily 7:00am – 9:30pm</li>
-                            <li>Fast checkout • Mobile Money accepted</li>
-                            <li>Local delivery for WhatsApp orders</li>
-                        </ul>
+                    <div class="fld">
+                        <label for="phone">Phone (or WhatsApp) *</label>
+                        <input id="phone" name="phone" placeholder="+256 7…">
+                        <small class="hint">We’ll call or WhatsApp if needed</small>
                     </div>
-                    <div class="card" style="padding:18px">
-                        <h4>Brands You Love</h4>
-                        <p>We stock popular and trusted brands across groceries, beverages, home care, and personal care.</p>
+                    <div class="fld">
+                        <label for="email">Email (optional)</label>
+                        <input id="email" name="email" type="email" placeholder="you@example.com">
                     </div>
-                    <div class="card" style="padding:18px">
-                        <h4>Quality Promise</h4>
-                        <p>If any product isn’t right, return it within 48 hours with receipt for an exchange.</p>
+                    <div class="fld">
+                        <label for="message">What would you like?</label>
+                        <textarea id="message" name="message" rows="5" placeholder="List the items and quantities…"></textarea>
+                    </div>
+                    <button class="btn primary" type="submit">Send Request</button>
+                    <div class="hint">We also take orders on WhatsApp: <a href="https://wa.me/<?= h($SITE['whatsapp']) ?>">chat now</a></div>
+                </form>
+
+                <div class="grid" style="gap:14px">
+                    <div class="feature">
+                        <div class="icon">☎</div>
+                        <div>
+                            <strong>Call us</strong>
+                            <div><a href="tel:<?= h($SITE['phone_call']) ?>"><?= h($SITE['phone_human']) ?></a></div>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="icon">✉</div>
+                        <div>
+                            <strong>Email</strong>
+                            <div><a href="mailto:<?= h($SITE['email']) ?>"><?= h($SITE['email']) ?></a></div>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="icon">🕒</div>
+                        <div>
+                            <strong>Hours</strong>
+                            <div class="muted"><?= h($SITE['hours']) ?></div>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="icon">📍</div>
+                        <div>
+                            <strong>Directions</strong>
+                            <div><a target="_blank" rel="noreferrer" href="https://www.google.com/maps/search/?api=1&query=<?= rawurlencode($SITE['lat'] . ',' . $SITE['lng']) ?>">Open in Google Maps</a></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Order & Contact -->
-        <section id="order">
-            <div class="container">
-                <h3 class="section-title">Order & Contact</h3>
-                <p class="section-desc">Reach us by phone, WhatsApp, or the contact form. We respond quickly during opening hours.</p>
-                <div class="contact" id="contact">
-                    <form method="post" action="/contact.php" id="contactForm" novalidate>
-                        <div class="row" style="margin-bottom:10px">
-                            <span class="tag">Call: +256 746 825 914</span>
-                            <span class="tag">Call: +256 781 988 570</span>
-                            <span class="tag">Email: phillipsein6@gmail.com</span>
-                            <span class="tag">Email: nabukeeraannet2@gmail.com</span>
-                        </div>
-                        <div class="field">
-                            <label for="name">Your name</label>
-                            <input id="name" name="name" type="text" required placeholder="Jane Doe" />
-                        </div>
-                        <div class="field">
-                            <label for="email">Email</label>
-                            <input id="email" name="email" type="email" required placeholder="you@example.com" />
-                        </div>
-                        <div class="field">
-                            <label for="phone">Phone / WhatsApp</label>
-                            <input id="phone" name="phone" type="tel" placeholder="+256…" />
-                        </div>
-                        <div class="field">
-                            <label for="message">How can we help?</label>
-                            <textarea id="message" name="message" rows="5" required placeholder="Tell us what you need…"></textarea>
-                        </div>
-                        <!-- Honeypot -->
-                        <input type="text" name="company" style="display:none" tabindex="-1" autocomplete="off">
-                        <button class="btn primary" type="submit">Send Message</button>
-                        <div class="hint">We’ll never share your details. You’ll also get a copy of your message by email.</div>
-                    </form>
-
-                    <!-- Replace src with your map or coordinates if you prefer -->
-                    <iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                        src="https://www.google.com/maps?q=0.288835138082504,32.6322174072266&z=15&output=embed"></iframe>
-                </div>
-            </div>
-        </section>
     </main>
 
+    <!-- Sticky Mobile Bar -->
+    <nav class="mbar">
+        <a href="tel:<?= h($SITE['phone_call']) ?>">
+            <div>📞</div><span>Call</span>
+        </a>
+        <a class="mint" href="https://wa.me/<?= h($SITE['whatsapp']) ?>?text=Hello%20ANN%20RETAIL%20SHOP">
+            <div>💬</div><span>WhatsApp</span>
+        </a>
+        <a href="https://www.google.com/maps/search/?api=1&query=<?= rawurlencode($SITE['lat'] . ',' . $SITE['lng']) ?>">
+            <div>📍</div><span>Map</span>
+        </a>
+        <a class="primary" href="#contact">
+            <div>🧺</div><span>Order</span>
+        </a>
+    </nav>
+
     <footer>
-        <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-            <div>© <span id="year"></span> ANN RETAIL SHOP • All rights reserved.</div>
-            <div class="row">
-                <a class="btn ghost" href="https://wa.me/256746825914" target="_blank" rel="noopener">WhatsApp</a>
-                <a class="btn ghost" href="tel:+256746825914">Call</a>
-                <a class="btn ghost" href="mailto:phillipsein6@gmail.com">Email</a>
+        <div class="wrap grid g3">
+            <div>
+                <div class="brand" style="gap:8px">
+                    <div class="logo">AR</div><span><?= h($SITE['name']) ?></span>
+                </div>
+                <div class="muted" style="margin-top:10px">© <?= date('Y') ?> <?= h($SITE['name']) ?>. All rights reserved.</div>
+            </div>
+            <div>
+                <strong>Contact</strong>
+                <div class="muted">Phone: <a href="tel:<?= h($SITE['phone_call']) ?>"><?= h($SITE['phone_human']) ?></a></div>
+                <div class="muted">Email: <a href="mailto:<?= h($SITE['email']) ?>"><?= h($SITE['email']) ?></a></div>
+                <div class="muted">Address: <?= h($SITE['address']) ?></div>
+            </div>
+            <div>
+                <strong>Open Hours</strong>
+                <div class="muted"><?= h($SITE['hours']) ?></div>
             </div>
         </div>
     </footer>
 
-    <!-- JSON‑LD: LocalBusiness -->
+    <!-- JS: menu + map -->
+    <script>
+        // Mobile menu
+        const menuBtn = document.getElementById('menuBtn');
+        const menuPanel = document.getElementById('menuPanel');
+        menuBtn?.addEventListener('click', () => menuPanel.classList.toggle('show'));
+
+        // Basic focus ring for keyboard users
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Tab') {
+                document.body.classList.add('show-focus');
+            }
+        });
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="" crossorigin=""></script>
+    <script>
+        // Leaflet map
+        const lat = <?= $SITE['lat'] ?>,
+            lng = <?= $SITE['lng'] ?>;
+        const map = L.map('map', {
+            scrollWheelZoom: false
+        }).setView([lat, lng], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map).bindPopup('<?= h($SITE['name']) ?>').openPopup();
+    </script>
+
+    <!-- SEO: LocalBusiness -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "Store",
-            "name": "ANN RETAIL SHOP",
-            "url": "https://annretailshop.com/",
-            "image": "https://images.unsplash.com/photo-1585386959984-a41552231658?q=80&w=1200&auto=format&fit=crop",
-            "telephone": "+256746825914",
-            "email": "sales@annretailshop.philltechs.com",
+            "name": "<?= h($SITE['name']) ?>",
+            "telephone": "<?= h($SITE['phone_human']) ?>",
             "address": {
                 "@type": "PostalAddress",
+                "addressLocality": "Kampala",
                 "addressCountry": "UG"
             },
-            "openingHours": "Mo-Su 07:00-21:30",
-            "sameAs": [
-                "https://wa.me/256746825914",
-                "https://wa.me/256781988570"
-            ]
+            "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": <?= $SITE['lat'] ?>,
+                "longitude": <?= $SITE['lng'] ?>
+            },
+            "url": "",
+            "openingHours": "Mo-Su 07:00-22:00",
+            "image": ""
         }
-    </script>
-
-    <script>
-        // Year
-        document.getElementById('year').textContent = new Date().getFullYear();
-
-        // Simple carousel controls
-        const track = document.getElementById('track');
-        document.getElementById('prevBtn').addEventListener('click', () => track.scrollBy({
-            left: -320,
-            behavior: 'smooth'
-        }));
-        document.getElementById('nextBtn').addEventListener('click', () => track.scrollBy({
-            left: 320,
-            behavior: 'smooth'
-        }));
-
-        // Form validation & UX
-        const form = document.getElementById('contactForm');
-        form.addEventListener('submit', (e) => {
-            const valid = form.checkValidity();
-            if (!valid) {
-                e.preventDefault();
-                alert('Please fill in the required fields correctly.');
-            }
-        });
-
-        // Fade-in on view
-        const io = new IntersectionObserver(entries => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    e.target.classList.add('shadow-pop');
-                    io.unobserve(e.target);
-                }
-            })
-        }, {
-            threshold: .14
-        });
-        document.querySelectorAll('.feature,.card,.cta').forEach(el => io.observe(el));
     </script>
 </body>
 
 </html>
-
-<!-- =========================
-     contact.php (place at your web root)
-     - Handles the contact form and emails the message to phillipsein6@gmail.com
-     - Requires PHP 7.4+ (Hostinger is OK). Uses built‑in mail() or PHPMailer (recommended).
-   ========================= -->
-<?php /*
-<?php
-// contact.php — basic, secure handler
-// Update these:
-$TO_EMAILS = ['phillipsein6@gmail.com','nabukeeraannet2@gmail.com'];
-$FROM_EMAIL = 'no-reply@annretailshop.com'; // Set this to an email on your domain (improves deliverability)
-$SITE_NAME  = 'ANN RETAIL SHOP';
-
-// Simple rate limit + spam trap
-session_start();
-if (!empty($_POST['company'])) { http_response_code(400); exit('Bad request'); } // honeypot
-if (isset($_SESSION['last_submit']) && time() - $_SESSION['last_submit'] < 20) { http_response_code(429); exit('Too many requests, try later.'); }
-$_SESSION['last_submit'] = time();
-
-// Validate
-$name    = trim($_POST['name'] ?? '');
-$email   = trim($_POST['email'] ?? '');
-$phone   = trim($_POST['phone'] ?? '');
-$message = trim($_POST['message'] ?? '');
-if (!$name || !filter_var($email, FILTER_VALIDATE_EMAIL) || !$message) {
-  http_response_code(400); exit('Invalid input');
-}
-
-$subject = "New inquiry from $SITE_NAME website";
-$body    = "Name: $name\nEmail: $email\nPhone: $phone\n\nMessage:\n$message\n\n--\n$SITE_NAME";
-$headers = [
-  'From' => "$SITE_NAME <$FROM_EMAIL>",
-  'Reply-To' => $email,
-  'Content-Type' => 'text/plain; charset=UTF-8'
-];
-
-// Option A: native mail()
-$okAll = true;
-foreach ($TO_EMAILS as $rcpt) {
-  $okAll = mail($rcpt, $subject, $body, $headers) && $okAll;
-}
-$ok = $okAll;
-
-// Option B (recommended): PHPMailer with Titan/SMTP
-// Uncomment and configure if you use Titan Email/Hostinger SMTP for higher deliverability.
-/*
-use PHPMailer\PHPMailer\PHPMailer; use PHPMailer\PHPMailer\SMTP; use PHPMailer\PHPMailer\Exception;
-require __DIR__.'/vendor/autoload.php';
-$mail = new PHPMailer(true);
-try {
-  $mail->isSMTP();
-  $mail->Host = 'smtp.titan.email';
-  $mail->SMTPAuth = true;
-  $mail->Username = 'no-reply@annretailshop.com'; // mailbox on your domain
-  $mail->Password = 'YOUR_SMTP_PASSWORD';
-  $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-  $mail->Port = 587;
-  $mail->setFrom('no-reply@annretailshop.com', $SITE_NAME);
-  $mail->addAddress('phillipsein6@gmail.com');
-  $mail->addAddress('nabukeeraannet2@gmail.com');
-  $mail->addReplyTo($email, $name);
-  $mail->Subject = $subject;
-  $mail->Body    = $body;
-  $ok = $mail->send();
-} catch (Exception $e) { $ok=false; }
-*/
-
-// Redirect back with status
-if ($ok) {
-    header('Location: /?ok=1#contact');
-} else {
-    header('Location: /?ok=0#contact');
-}
-exit;
-?>
-*/ ?>

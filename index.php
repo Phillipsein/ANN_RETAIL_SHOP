@@ -586,6 +586,119 @@
             white-space: nowrap;
             justify-content: center
         }
+
+        .hero-copy {
+            max-width: 680px
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fffbeb;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            line-height: 1.12;
+            margin: 10px 0 8px
+        }
+
+        .brand-grad {
+            background: linear-gradient(90deg, #f97316, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap
+        }
+
+        .accent-underline {
+            display: block;
+            margin-top: 6px;
+            font-size: .9em;
+            color: #475569;
+            position: relative;
+            padding-bottom: 8px
+        }
+
+        .accent-underline:after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 120px;
+            height: 6px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #f97316, #10b981);
+            opacity: .35
+        }
+
+        .lead {
+            color: #475569;
+            font-size: 16px;
+            margin: 12px 0 16px
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 8px 0 6px
+        }
+
+        .cta-row .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .cta-row .btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor
+        }
+
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        .chip svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 960px) {
+            .hero-title {
+                font-size: 32px
+            }
+        }
     </style>
 </head>
 

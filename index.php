@@ -583,9 +583,9 @@
                 </div>
                 <div class="hero-visual">
                     <div class="hero-card">
-                        <img alt="Retail aisle" src="https://www.marketing91.com/wp-content/uploads/2018/01/Types-of-Retail-Stores-2.jpg" />
+                        <img alt="Retail aisle" src="https://cdn.hinative.com/attached_images/557489/159379715bcf57690c1b15800481df1501af2899/large.jpg?1581648146" />
                     </div>
-                    <img class="float one" style="width:160px" alt="groceries" src="https://cdn.houseaffection.com/wp-content/uploads/Food-Pantry-Items.jpg" />
+                    <img class="float one" style="width:160px" alt="groceries" src="https://thumbs.dreamstime.com/b/fully-stocked-shelves-food-household-items-local-pick-n-pay-grocery-store-johannesburg-south-africa-february-182028220.jpg" />
                     
                 </div>
             </div>

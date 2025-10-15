@@ -909,35 +909,86 @@
         </section>
 
         <!-- About / Testimonials -->
-        <section>
+        <section class="about-section">
             <div class="container">
-                <h3 class="section-title">About ANN RETAIL SHOP</h3>
-                <p class="section-desc">We’re proud to serve our community with reliable stock, neat shelves, and a smile. Our mission is simple: make everyday shopping fast and stress‑free.</p>
-                <div class="grid">
-                    <div class="card" style="padding:18px">
-                        <h4>Customer Reviews</h4>
-                        <p>“Clean shop, fair prices, and the staff are kind.” — <em>Sarah K.</em></p>
-                        <p>“Always find what I need. Quick checkout.” — <em>Moses B.</em></p>
-                    </div>
-                    <div class="card" style="padding:18px">
-                        <h4>Store Highlights</h4>
-                        <ul>
-                            <li>Open daily 7:00am – 9:30pm</li>
-                            <li>Fast checkout • Mobile Money accepted</li>
-                            <li>Local delivery for WhatsApp orders</li>
+                <header class="about-head">
+                    <span class="about-badge">Since day one</span>
+                    <h3 class="about-title">
+                        About <span class="brand-grad">ANN RETAIL SHOP</span>
+                    </h3>
+                    <p class="about-desc">
+                        We serve the neighborhood with fresh stock, neat shelves, and friendly prices — making
+                        everyday shopping fast and stress-free.
+                    </p>
+                </header>
+
+                <div class="about-grid">
+                    <!-- Testimonials -->
+                    <article class="about-card">
+                        <div class="stars" aria-label="5 star rating">
+                            <span>★</span><span>★</span><span>★</span><span>★</span><span class="half">★</span>
+                        </div>
+                        <h4 class="card-title">Customer Reviews</h4>
+                        <p class="quote">“Clean shop, fair prices, and the staff are kind.” <em>— Sarah K.</em></p>
+                        <p class="quote">“Always find what I need. Quick checkout.” <em>— Moses B.</em></p>
+                        <div class="trust-row">
+                            <span class="pill soft">Over 1,000 happy shoppers</span>
+                            <span class="pill soft">4.8 / 5 rating</span>
+                        </div>
+                    </article>
+
+                    <!-- Highlights -->
+                    <article class="about-card">
+                        <h4 class="card-title">Store Highlights</h4>
+                        <ul class="icon-list">
+                            <li>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 3h16v4H4zM6 7v14h12V7" />
+                                </svg>
+                                Open daily <strong>7:00am – 9:30pm</strong>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M20 6 9 17l-5-5" />
+                                </svg>
+                                Fast checkout • Mobile Money accepted
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M3 7h18M6 7v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7" />
+                                </svg>
+                                Local delivery for WhatsApp orders
+                            </li>
                         </ul>
-                    </div>
-                    <div class="card" style="padding:18px">
-                        <h4>Brands You Love</h4>
-                        <p>We stock popular and trusted brands across groceries, beverages, home care, and personal care.</p>
-                    </div>
-                    <div class="card" style="padding:18px">
-                        <h4>Quality Promise</h4>
-                        <p>If any product isn’t right, return it within 48 hours with receipt for an exchange.</p>
-                    </div>
+                    </article>
+
+                    <!-- Brands -->
+                    <article class="about-card">
+                        <h4 class="card-title">Brands You Love</h4>
+                        <p>We stock trusted brands across groceries, beverages, home care, and personal care.</p>
+                        <div class="brand-chips">
+                            <span class="chip">Premium rice</span>
+                            <span class="chip">Top oils</span>
+                            <span class="chip">Quality soaps</span>
+                            <span class="chip">Fresh beverages</span>
+                        </div>
+                    </article>
+
+                    <!-- Promise -->
+                    <article class="about-card">
+                        <h4 class="card-title">Quality Promise</h4>
+                        <p>If any product isn’t right, return it within <strong>48 hours</strong> with receipt for an exchange.</p>
+                        <div class="guarantee">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 6 9 17l-5-5" />
+                            </svg>
+                            Satisfaction guaranteed
+                        </div>
+                    </article>
                 </div>
             </div>
         </section>
+
 
         <!-- Order & Contact -->
         <section id="order">

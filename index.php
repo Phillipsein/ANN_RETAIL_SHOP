@@ -23,7 +23,6 @@
     <!-- Letter “A” favicon with orange→mint gradient background -->
     <link rel="icon" type="image/svg+xml"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23f97316'/%3E%3Cstop offset='100%25' stop-color='%2310b981'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='18' fill='url(%23g)'/%3E%3Ctext x='50' y='64' font-size='64' font-weight='700' text-anchor='middle' fill='white' font-family='Arial, Helvetica, sans-serif'%3EA%3C/text%3E%3C/svg%3E">
-    <meta name="theme-color" content="#f97316">
 
 
     <style>
@@ -627,20 +626,59 @@
         <!-- Hero -->
         <section class="hero">
             <div class="container inner">
-                <div>
-                    <span class="badge shadow-pop">Everyday essentials • Fast service • Friendly prices</span>
-                    <h1>Welcome to <span style="color:var(--brand)">ANN RETAIL SHOP</span><br />Your neighbourhood store for all essentials.</h1>
-                    <p>Fresh groceries, home & cleaning, personal care, snacks & beverages, baby needs, and more. Shop in‑store or order by phone / WhatsApp — we deliver around town.</p>
-                    <div class="row">
-                        <a class="btn primary" href="#order">Order on WhatsApp</a>
-                        <a class="btn" href="#catalog">Browse Categories</a>
+                <div class="hero-copy">
+                    <span class="badge">Everyday essentials • Fast • Friendly</span>
+
+                    <h1 class="hero-title">
+                        Welcome to <span class="brand-grad">ANN RETAIL SHOP</span>
+                        <span class="accent-underline">Your neighbourhood store for all essentials</span>
+                    </h1>
+
+                    <p class="lead">
+                        Fresh groceries, home & cleaning, personal care, snacks & beverages, baby needs, and more.
+                        Shop in-store or order via WhatsApp — we deliver around town.
+                    </p>
+
+                    <div class="cta-row">
+                        <a class="btn primary" href="https://wa.me/256746825914" target="_blank" rel="noopener">
+                            <!-- WhatsApp icon -->
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 3.9A10 10 0 0 0 3.1 17.3L2 22l4.8-1A10 10 0 1 0 20 3.9ZM12 20a8 8 0 0 1-4.1-1.1l-.3-.2-2.8.6.6-2.7-.2-.3A8 8 0 1 1 12 20Zm4.6-5.3c-.2-.1-1.1-.6-1.3-.7-.2-.1-.4-.1-.6.1-.2.2-.6.7-.7.8-.1.2-.3.2-.5.1-.2-.1-.9-.3-1.7-1-.6-.6-1-1.3-1.1-1.5-.1-.2 0-.3.1-.5l.4-.5c.1-.2.1-.3.2-.5 0-.2 0-.3 0-.4 0-.1-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.8 2.3.9 2.4c.1.2 1.6 2.5 3.9 3.5.5.2.9.4 1.2.5.5.2 1 .2 1.4.1.4-.1 1.1-.4 1.3-.9.2-.5.2-.9.1-1 .1-.1 0-.1-.1-.2Z" />
+                            </svg>
+                            Order on WhatsApp
+                        </a>
+
+                        <a class="btn" href="#catalog">
+                            <!-- Grid icon -->
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M3 3h8v8H3V3Zm10 0h8v8h-8V3ZM3 13h8v8H3v-8Zm10 0h8v8h-8v-8Z" />
+                            </svg>
+                            Browse Categories
+                        </a>
                     </div>
-                    <div class="row" style="margin-top:10px">
-                        <span class="tag">Deals updated weekly</span>
-                        <span class="tag">Mobile payments accepted</span>
-                        <span class="tag">Return policy: 48 hours</span>
+
+                    <div class="chips">
+                        <span class="chip">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 6 9 17l-5-5" />
+                            </svg>
+                            Weekly deals
+                        </span>
+                        <span class="chip">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 22s8-4 8-10a8 8 0 1 0-16 0c0 6 8 10 8 10Z" />
+                            </svg>
+                            Mobile payments
+                        </span>
+                        <span class="chip">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 6 9 17l-5-5" />
+                            </svg>
+                            48-hour returns
+                        </span>
                     </div>
                 </div>
+
                 <div class="hero-visual">
                     <div class="hero-card">
                         <img alt="Retail aisle" src="https://www.marketing91.com/wp-content/uploads/2018/01/Types-of-Retail-Stores-2.jpg" />

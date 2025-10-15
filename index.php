@@ -629,7 +629,7 @@
                             <div>Juice, water, soda, tea…</div>
                         </div>
                     </a>
-                    <a class="card" href="#order"><img alt="Personal care" src="https://images.unsplash.com/photo-1556228453-efd1e7f49b8f?q=80&w=1200&auto=format&fit=crop">
+                    <a class="card" href="#order"><img alt="Personal care" src="https://images.pond5.com/dollar-general-retail-store-interior-footage-220690764_iconl.jpeg">
                         <div class="content"><strong>Personal Care</strong>
                             <div>Soaps, toothpaste, lotion…</div>
                         </div>

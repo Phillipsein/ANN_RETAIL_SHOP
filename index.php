@@ -19,11 +19,14 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
-    <!-- Tab icon / favicon (uses your logo) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/ann-logo2.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/ann-logo2.png">
-    <link rel="apple-touch-icon" href="/assets/ann-logo2.png">
+    <!-- Modern SVG + fallbacks (much more visible) -->
+    <link rel="icon" href="/assets/ann-favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/x-icon" href="/assets/ann-favicon.ico">
+    <link rel="icon" sizes="32x32" href="/assets/ann-32.png">
+    <link rel="icon" sizes="192x192" href="/assets/ann-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/ann-apple-180.png">
     <meta name="theme-color" content="#f97316">
+
 
 
     <style>

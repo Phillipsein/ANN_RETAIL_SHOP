@@ -585,7 +585,7 @@
                     <div class="hero-card">
                         <img alt="Retail aisle" src="https://www.marketing91.com/wp-content/uploads/2018/01/Types-of-Retail-Stores-2.jpg" />
                     </div>
-                    <img class="float one" style="width:160px" alt="groceries" src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600&auto=format&fit=crop" />
+                    <img class="float one" style="width:160px" alt="groceries" src="https://cdn.houseaffection.com/wp-content/uploads/Food-Pantry-Items.jpg" />
                     
                 </div>
             </div>

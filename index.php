@@ -699,6 +699,190 @@
                 font-size: 32px
             }
         }
+
+        /* Section shell */
+        .about-section {
+            padding: 34px 0
+        }
+
+        .about-head {
+            max-width: 760px;
+            margin: 0 auto 18px;
+            text-align: center
+        }
+
+        .about-badge {
+            display: inline-block;
+            background: #fffbeb;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        .about-title {
+            margin: 8px 0 6px;
+            font-size: 28px
+        }
+
+        .brand-grad {
+            background: linear-gradient(90deg, #f97316, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .about-desc {
+            color: var(--muted);
+            margin: 0 auto
+        }
+
+        /* Grid */
+        .about-grid {
+            display: grid;
+            gap: 14px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        @media (max-width: 900px) {
+            .about-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* Cards */
+        .about-card {
+            position: relative;
+            background: var(--card);
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid #eef2f7;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, .06);
+            overflow: hidden;
+        }
+
+        .about-card:before {
+            content: "";
+            position: absolute;
+            inset: -40% -20% auto -20%;
+            height: 120%;
+            background: radial-gradient(400px 200px at 10% 10%, rgba(249, 115, 22, .08), transparent 60%),
+                radial-gradient(380px 180px at 90% 0%, rgba(16, 185, 129, .08), transparent 60%);
+            filter: blur(8px);
+            z-index: 0
+        }
+
+        .about-card>* {
+            position: relative;
+            z-index: 1
+        }
+
+        .card-title {
+            margin: 0 0 6px;
+            font-size: 18px
+        }
+
+        /* Stars */
+        .stars {
+            color: #f59e0b;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            font-size: 16px
+        }
+
+        .stars .half {
+            opacity: .6
+        }
+
+        /* Quotes & trust */
+        .quote {
+            margin: 6px 0;
+            color: var(--muted)
+        }
+
+        .trust-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px
+        }
+
+        .pill.soft {
+            background: #ecfeff;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        /* Icon list */
+        .icon-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 8px
+        }
+
+        .icon-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--ink)
+        }
+
+        .icon-list svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            flex: 0 0 auto
+        }
+
+        /* Brand chips */
+        .brand-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px
+        }
+
+        .brand-chips .chip {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        /* Guarantee line */
+        .guarantee {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-weight: 700
+        }
+
+        .guarantee svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2
+        }
     </style>
 </head>
 

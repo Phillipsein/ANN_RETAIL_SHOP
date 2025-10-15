@@ -624,7 +624,7 @@
                             <div>Rice, flour, sugar, beans…</div>
                         </div>
                     </a>
-                    <a class="card" href="#order"><img alt="Beverages" src="https://images.unsplash.com/photo-1559718062-361155fad299?q=80&w=1200&auto=format&fit=crop">
+                    <a class="card" href="#order"><img alt="Beverages" src="https://content.presspage.com/uploads/2700/1920_malaysiarebsdeandmbeverages.jpg?10000">
                         <div class="content"><strong>Beverages</strong>
                             <div>Juice, water, soda, tea…</div>
                         </div>

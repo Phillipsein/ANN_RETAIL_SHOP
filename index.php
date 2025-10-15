@@ -690,8 +690,8 @@
                         <div>Message us on WhatsApp and we’ll prepare your order.</div>
                     </div>
                     <div class="row">
-                        <a class="btn" href="https://wa.me/256746825914" target="_blank" rel="noopener">WhatsApp: +256 746 825 914</a>
-                        <a class="btn" href="https://wa.me/256781988570" target="_blank" rel="noopener">WhatsApp: +256 781 988 570</a>
+                        <a class="btn" style="color: black;" href="https://wa.me/256746825914" target="_blank" rel="noopener">WhatsApp: +256 746 825 914</a>
+                        <a class="btn" style="color: black;" href="https://wa.me/256781988570" target="_blank" rel="noopener">WhatsApp: +256 781 988 570</a>
                     </div>
                 </div>
             </div>

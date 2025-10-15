@@ -19,8 +19,12 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
-    <!-- Favicon (placeholder) -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230ea5e9'/%3E%3Ctext x='50' y='58' font-size='58' text-anchor='middle' fill='white' font-family='Arial, Helvetica, sans-serif'%3EA%3C/text%3E%3C/svg%3E" />
+    <!-- Tab icon / favicon (uses your logo) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/ann-logo2.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/ann-logo2.png">
+    <link rel="apple-touch-icon" href="/assets/ann-logo2.png">
+    <meta name="theme-color" content="#f97316">
+
 
     <style>
         :root {

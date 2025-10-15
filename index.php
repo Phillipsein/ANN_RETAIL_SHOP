@@ -506,7 +506,7 @@
         .mobile-hide {
             display: none
         }
-        
+
 
         @media (min-width: 961px) {
             .mobile-hide {
@@ -583,7 +583,7 @@
                 </div>
                 <div class="hero-visual">
                     <div class="hero-card">
-                        <img alt="Retail aisle" src="https://images.unsplash.com/photo-1586201375761-83865001e31b?q=80&w=1200&auto=format&fit=crop" />
+                        <img alt="Retail aisle" src="https://www.marketing91.com/wp-content/uploads/2018/01/Types-of-Retail-Stores-2.jpg" />
                     </div>
                     <img class="float one" style="width:160px" alt="groceries" src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600&auto=format&fit=crop" />
                     <img class="float two" style="width:220px" alt="basket" src="https://images.unsplash.com/photo-1597074866923-02c5d9b3327e?q=80&w=800&auto=format&fit=crop" />

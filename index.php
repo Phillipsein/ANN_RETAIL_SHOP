@@ -591,7 +591,7 @@
             <div class="brand">
                 <div class="logo-wrap" aria-hidden="true">
                     <div class="inner">
-                        <img src="assets/ann-logo2.png" alt="ANN RETAIL SHOP logo" />
+                        <img src="assets/logo.png" alt="ANN RETAIL SHOP logo" />
                     </div>
                 </div>
                 <div>

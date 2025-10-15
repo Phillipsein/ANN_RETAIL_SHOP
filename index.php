@@ -106,13 +106,14 @@
             display: grid;
             place-items: center;
             overflow: hidden;
+            padding: 6px;
+            /* 👈 added padding inside the logo frame */
         }
 
         .logo-wrap .inner img {
             height: 100%;
             width: 100%;
             object-fit: contain;
-            /* ensures full logo visible */
         }
 
         .brand .name {

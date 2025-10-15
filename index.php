@@ -634,7 +634,7 @@
                             <div>Soaps, toothpaste, lotion…</div>
                         </div>
                     </a>
-                    <a class="card" href="#order"><img alt="Cleaning" src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1200&auto=format&fit=crop">
+                    <a class="card" href="#order"><img alt="Cleaning" src="https://thumbs.dreamstime.com/z/cleaning-products-supermarket-23731231.jpg?w=768">
                         <div class="content"><strong>Home & Cleaning</strong>
                             <div>Detergents, tissues…</div>
                         </div>

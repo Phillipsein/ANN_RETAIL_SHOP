@@ -540,13 +540,18 @@
     <header>
         <div class="container nav">
             <div class="brand">
-                <!-- Replace this taste image with your real logo (square recommended) -->
-                <img class="logo" alt="ANN Retail Shop logo" src="assets/ann-logo2.png" />
+                <div class="logo-wrap" aria-hidden="true">
+                    <div class="inner">
+                        <img src="assets/ann-logo2.png" alt="ANN RETAIL SHOP logo" />
+                    </div>
+                </div>
                 <div>
-                    <div class="name">ANN RETAIL SHOP</div>
+                    <div class="name"><span class="grad">ANN RETAIL SHOP</span></div>
+                    <div class="subline">Everyday essentials • Neighbourhood store</div>
                     <div class="pill" title="Open 7 days a week">Open • 7:00am – 9:30pm</div>
                 </div>
             </div>
+
             <div class="actions">
                 <a class="btn ghost mobile-hide" href="https://wa.me/256746825914" target="_blank" rel="noopener">WhatsApp</a>
                 <a class="btn" href="#contact">Call / Visit</a>
@@ -554,6 +559,7 @@
             </div>
         </div>
     </header>
+
     <div class="mstrip">
         <div class="container">
             <a class="btn" href="#catalog">Categories</a>
@@ -586,7 +592,7 @@
                         <img alt="Retail aisle" src="https://www.marketing91.com/wp-content/uploads/2018/01/Types-of-Retail-Stores-2.jpg" />
                     </div>
                     <img class="float one" style="width:160px" alt="groceries" src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600&auto=format&fit=crop" />
-                    
+
                 </div>
             </div>
         </section>

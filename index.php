@@ -19,14 +19,11 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
-    <!-- Modern SVG + fallbacks (much more visible) -->
-    <link rel="icon" href="/assets/ann-favicon.svg" type="image/svg+xml">
-    <link rel="icon" type="image/x-icon" href="/assets/ann-favicon.ico">
-    <link rel="icon" sizes="32x32" href="/assets/ann-32.png">
-    <link rel="icon" sizes="192x192" href="/assets/ann-192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/ann-apple-180.png">
+    <!-- Favicon (placeholder) -->
+    <!-- Letter “A” favicon with orange→mint gradient background -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23f97316'/%3E%3Cstop offset='100%25' stop-color='%2310b981'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='18' fill='url(%23g)'/%3E%3Ctext x='50' y='64' font-size='64' font-weight='700' text-anchor='middle' fill='white' font-family='Arial, Helvetica, sans-serif'%3EA%3C/text%3E%3C/svg%3E">
     <meta name="theme-color" content="#f97316">
-
 
 
     <style>

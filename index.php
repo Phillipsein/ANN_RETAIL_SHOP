@@ -619,7 +619,7 @@
                 <h3 class="section-title">Popular categories</h3>
                 <p class="section-desc">A quick look at our most requested items.</p>
                 <div class="grid">
-                    <a class="card" href="#order"><img alt="Groceries" src="https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=1200&auto=format&fit=crop">
+                    <a class="card" href="#order"><img alt="Groceries" src="https://tse3.mm.bing.net/th/id/OIP.Liols46qTt5HfXKIHJXHVAAAAA?cb=12&w=450&h=800&rs=1&pid=ImgDetMain&o=7&rm=3">
                         <div class="content"><strong>Groceries</strong>
                             <div>Rice, flour, sugar, beans…</div>
                         </div>

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ANN RETAIL SHOP | Everyday Essentials at Great Prices</title>
     <meta name="description" content="ANN RETAIL SHOP — your neighbourhood store for groceries, household items, personal care, and more. Order, call, or visit us today!" />
-    <meta name="theme-color" content="#0ea5e9" />
+    <meta name="theme-color" content="#f97316" />
 
     <!-- SEO / Social -->
     <meta property="og:title" content="ANN RETAIL SHOP" />
@@ -24,13 +24,15 @@
 
     <style>
         :root {
-            --brand: #0ea5e9;
-            --brand-600: #0284c7;
+            --brand: #f97316;
+            --brand-600: #ea580c;
+            --accent: #10b981;
+            --accent-600: #059669;
             --ink: #0f172a;
             --muted: #475569;
             --bg: #f8fafc;
             --card: #ffffff;
-            --ring: rgba(14, 165, 233, .25)
+            --ring: rgba(249, 115, 22, .25)
         }
 
         * {
@@ -101,11 +103,12 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: #e0f2fe;
-            color: #075985;
+            background: #d1fae5;
+            color: #065f46;
             padding: 8px 12px;
             border-radius: 999px;
-            font-size: 14px
+            font-size: 14px;
+            border: 1px solid #a7f3d0
         }
 
         .actions {
@@ -129,6 +132,11 @@
 
         .btn:hover {
             transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, .08)
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
             box-shadow: 0 8px 24px rgba(2, 132, 199, .18)
         }
 
@@ -136,6 +144,11 @@
             background: var(--brand);
             border-color: var(--brand);
             color: #fff
+        }
+
+        .btn.primary:hover {
+            background: var(--brand-600);
+            border-color: var(--brand-600)
         }
 
         .btn.ghost {
@@ -150,6 +163,21 @@
         .hero {
             position: relative;
             overflow: hidden
+        }
+
+        .hero:before {
+            content: "";
+            position: absolute;
+            inset: -20% -10% auto -10%;
+            height: 120%;
+            background: radial-gradient(600px 300px at 20% 20%, rgba(249, 115, 22, .18), transparent 60%), radial-gradient(500px 250px at 80% 10%, rgba(16, 185, 129, .18), transparent 60%);
+            filter: blur(10px);
+            z-index: 0
+        }
+
+        .hero .inner {
+            position: relative;
+            z-index: 1
         }
 
         .hero .inner {
@@ -177,9 +205,9 @@
             display: inline-flex;
             gap: 8px;
             align-items: center;
-            background: #ecfeff;
-            border: 1px solid #cffafe;
-            color: #0c4a6e;
+            background: #fffbeb;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
             padding: 8px 12px;
             border-radius: 999px;
             font-weight: 600;
@@ -187,7 +215,7 @@
         }
 
         .hero-card {
-            background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);
+            background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
             padding: 20px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(2, 132, 199, .12)
@@ -326,7 +354,7 @@
 
         /* CTA band */
         .cta {
-            background: linear-gradient(90deg, #0ea5e9, #22d3ee);
+            background: linear-gradient(90deg, var(--brand), var(--accent));
             color: #fff;
             border-radius: 20px;
             padding: 20px;
@@ -656,6 +684,7 @@
                             <span class="tag">Call: +256 746 825 914</span>
                             <span class="tag">Call: +256 781 988 570</span>
                             <span class="tag">Email: phillipsein6@gmail.com</span>
+                            <span class="tag">Email: nabukeeraannet2@gmail.com</span>
                         </div>
                         <div class="field">
                             <label for="name">Your name</label>
@@ -771,7 +800,7 @@
 <?php
 // contact.php — basic, secure handler
 // Update these:
-$TO_EMAIL = 'phillipsein6@gmail.com';
+$TO_EMAILS = ['phillipsein6@gmail.com','nabukeeraannet2@gmail.com'];
 $FROM_EMAIL = 'no-reply@annretailshop.com'; // Set this to an email on your domain (improves deliverability)
 $SITE_NAME  = 'ANN RETAIL SHOP';
 
@@ -799,7 +828,11 @@ $headers = [
 ];
 
 // Option A: native mail()
-$ok = mail($TO_EMAIL, $subject, $body, $headers);
+$okAll = true;
+foreach ($TO_EMAILS as $rcpt) {
+  $okAll = mail($rcpt, $subject, $body, $headers) && $okAll;
+}
+$ok = $okAll;
 
 // Option B (recommended): PHPMailer with Titan/SMTP
 // Uncomment and configure if you use Titan Email/Hostinger SMTP for higher deliverability.
@@ -816,7 +849,8 @@ try {
   $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
   $mail->Port = 587;
   $mail->setFrom('no-reply@annretailshop.com', $SITE_NAME);
-  $mail->addAddress($TO_EMAIL);
+  $mail->addAddress('phillipsein6@gmail.com');
+  $mail->addAddress('nabukeeraannet2@gmail.com');
   $mail->addReplyTo($email, $name);
   $mail->Subject = $subject;
   $mail->Body    = $body;

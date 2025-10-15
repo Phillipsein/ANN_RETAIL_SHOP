@@ -41,7 +41,7 @@
 
         html,
         body {
-            margin: 10;
+            margin: 20;
             padding: 0;
             font-family: 'Inter', system-ui, Segoe UI, Roboto, Arial, sans-serif;
             color: var(--ink);

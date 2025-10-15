@@ -662,17 +662,17 @@
                             <div>High demand</div>
                         </div>
                     </div>
-                    <div class="item card"><img alt="Beans" src="https://images.unsplash.com/photo-1607301405394-4a578b865c98?q=80&w=1200&auto=format&fit=crop">
+                    <div class="item card"><img alt="Beans" src="https://totco.co.ug/wp-content/uploads/2023/01/beans.jpg">
                         <div class="content"><strong>Beans 1kg</strong>
                             <div>Fresh stock</div>
                         </div>
                     </div>
-                    <div class="item card"><img alt="Rice" src="https://images.unsplash.com/photo-1565688534245-05d6b5be1847?q=80&w=1200&auto=format&fit=crop">
+                    <div class="item card"><img alt="Rice" src="https://tse4.mm.bing.net/th/id/OIP.7V7PgTWVBBzeC9LZNfzbQwHaHa?cb=12&w=700&h=700&rs=1&pid=ImgDetMain&o=7&rm=3">
                         <div class="content"><strong>Rice 5kg</strong>
                             <div>Customer favourite</div>
                         </div>
                     </div>
-                    <div class="item card"><img alt="Toothpaste" src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?q=80&w=1200&auto=format&fit=crop">
+                    <div class="item card"><img alt="Toothpaste" src="https://tse1.mm.bing.net/th/id/OIP.r0cjQFctx3GewO39qSao1gHaHa?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3">
                         <div class="content"><strong>Toothpaste</strong>
                             <div>Multi‑buy deal</div>
                         </div>

@@ -541,7 +541,7 @@
         <div class="container nav">
             <div class="brand">
                 <!-- Replace this taste image with your real logo (square recommended) -->
-                <img class="logo" alt="ANN Retail Shop logo" src="https://images.unsplash.com/photo-1526403226243-67b9d8bd22d9?q=80&w=256&auto=format&fit=crop" />
+                <img class="logo" alt="ANN Retail Shop logo" src="assets/ann-logo.png" />
                 <div>
                     <div class="name">ANN RETAIL SHOP</div>
                     <div class="pill" title="Open 7 days a week">Open • 7:00am – 9:30pm</div>

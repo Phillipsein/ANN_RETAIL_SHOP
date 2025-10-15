@@ -89,7 +89,7 @@
 
         .brand img.logo {
             height: 40px;
-            width: 40px;
+            width: 50px;
             border-radius: 12px;
             /* box-shadow: 0 6px 16px rgba(2, 132, 199, .25) */
         }

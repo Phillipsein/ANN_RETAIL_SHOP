@@ -1031,6 +1031,195 @@
             font-weight: 800;
             font-size: 12px
         }
+
+        /* === Order & Contact (polished) === */
+        .order-contact {
+            padding: 30px 0
+        }
+
+        .contact-head {
+            background: linear-gradient(90deg, var(--brand), var(--accent));
+            color: #fff;
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, .08)
+        }
+
+        .head-left .section-title {
+            margin: 4px 0 4px;
+            color: #fff
+        }
+
+        .head-left .section-desc {
+            margin: 0;
+            color: #f0fdf4;
+            opacity: .95
+        }
+
+        .head-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, .18);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, .3)
+        }
+
+        .head-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .head-btn {
+            background: #fff;
+            border-color: #fff;
+            color: #0f172a;
+            font-weight: 800
+        }
+
+        .head-btn:hover {
+            transform: translateY(-1px)
+        }
+
+        .contact-grid {
+            display: grid;
+            gap: 14px;
+            margin-top: 14px;
+            grid-template-columns: 1fr;
+            /* mobile */
+        }
+
+        @media(min-width:960px) {
+            .contact-grid {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        .contact-card,
+        .map-card {
+            background: #fff;
+            border: 1px solid #eef2f7;
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 8px 22px rgba(2, 132, 199, .06)
+        }
+
+        /* Chips row */
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 8px
+        }
+
+        .chip {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 12px
+        }
+
+        /* Fields with icons */
+        .field {
+            margin-bottom: 10px
+        }
+
+        .field label {
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: block
+        }
+
+        .input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center
+        }
+
+        .input-wrap svg {
+            width: 18px;
+            height: 18px;
+            position: absolute;
+            left: 12px;
+            opacity: .7;
+            pointer-events: none
+        }
+
+        .input-wrap input,
+        .input-wrap textarea {
+            width: 100%;
+            padding: 12px 14px 12px 38px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: var(--ink);
+            font-size: 16px;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s
+        }
+
+        .input-wrap.textarea textarea {
+            min-height: 120px;
+            resize: vertical
+        }
+
+        .input-wrap input:focus,
+        .input-wrap textarea:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 4px var(--ring)
+        }
+
+        .submit-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .submit-row .hint {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        /* Map card */
+        .map-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px
+        }
+
+        .map-head .muted {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .btn.mini {
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #fff
+        }
+
+        iframe.map {
+            width: 100%;
+            height: 100%;
+            min-height: 320px;
+            border: 0;
+            border-radius: 12px
+        }
     </style>
 </head>
 
@@ -1358,45 +1547,95 @@
 
 
         <!-- Order & Contact -->
-        <section id="order">
+        <section id="order" class="order-contact">
             <div class="container">
-                <h3 class="section-title">Order & Contact</h3>
-                <p class="section-desc">Reach us by phone, WhatsApp, or the contact form. We respond quickly during opening hours.</p>
-                <div class="contact" id="contact">
-                    <form method="post" action="/contact.php" id="contactForm" novalidate>
-                        <div class="row" style="margin-bottom:10px">
-                            <span class="tag">Call: +256 746 825 914</span>
-                            <span class="tag">Call: +256 781 988 570</span>
-                            <span class="tag">Email: nabukeeraannet2@gmail.com</span>
+                <div class="contact-head">
+                    <div class="head-left">
+                        <div class="head-badge">We reply fast</div>
+                        <h3 class="section-title">Order & Contact</h3>
+                        <p class="section-desc">Reach us by phone, WhatsApp, or the form. We respond quickly during opening hours.</p>
+                    </div>
+                    <div class="head-actions">
+                        <a class="btn head-btn" href="tel:+256746825914">Call 0746 825 914</a>
+                        <a class="btn head-btn" href="https://wa.me/256746825914" target="_blank" rel="noopener">WhatsApp</a>
+                    </div>
+                </div>
+
+                <div class="contact-grid" id="contact">
+                    <!-- Form card -->
+                    <form method="post" action="/contact.php" id="contactForm" novalidate class="contact-card">
+                        <div class="chips">
+                            <span class="chip">Call: 0746 825 914</span>
+                            <span class="chip">Call: 0781 988 570</span>
+                            <span class="chip">Email: nabukeeraannet2@gmail.com</span>
                         </div>
+
                         <div class="field">
                             <label for="name">Your name</label>
-                            <input id="name" name="name" type="text" required placeholder="Name Here" />
+                            <div class="input-wrap">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-5 0-9 2.5-9 5v1h18v-1c0-2.5-4-5-9-5Z" />
+                                </svg>
+                                <input id="name" name="name" type="text" required placeholder="Name here" />
+                            </div>
                         </div>
+
                         <div class="field">
                             <label for="email">Email</label>
-                            <input id="email" name="email" type="email" required placeholder="you@example.com" />
+                            <div class="input-wrap">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 6h16v12H4z" />
+                                    <path d="m22 6-10 7L2 6" />
+                                </svg>
+                                <input id="email" name="email" type="email" required placeholder="you@example.com" />
+                            </div>
                         </div>
+
                         <div class="field">
                             <label for="phone">Phone / WhatsApp</label>
-                            <input id="phone" name="phone" type="tel" placeholder="+256…" />
+                            <div class="input-wrap">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M22 16.9A10 10 0 1 1 7.1 2 10 10 0 0 1 22 16.9Zm-4.6-2.2c-.2-.1-1.1-.6-1.3-.7-.2-.1-.4-.1-.6.1l-.7.8c-.1.2-.3.2-.5.1-1.4-.7-2.6-1.8-3.3-3.2-.1-.2 0-.3.1-.5l.4-.5c.1-.2.1-.3.2-.5s0-.3 0-.4c0-.1-.6-1.5-.8-2s-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.8 2.3.9 2.4c.1.2 1.6 2.5 3.9 3.5.5.2.9.4 1.2.5.5.2 1 .2 1.4.1.4-.1 1.1-.4 1.3-.9.2-.5.2-.9.1-1 0-.1 0-.1-.2-.2Z" />
+                                </svg>
+                                <input id="phone" name="phone" type="tel" placeholder="+256…" />
+                            </div>
                         </div>
+
                         <div class="field">
                             <label for="message">How can we help?</label>
-                            <textarea id="message" name="message" rows="5" required placeholder="Tell us what you need…"></textarea>
+                            <div class="input-wrap textarea">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
+                                </svg>
+                                <textarea id="message" name="message" rows="5" required placeholder="Tell us what you need…"></textarea>
+                            </div>
                         </div>
+
                         <!-- Honeypot -->
-                        <input type="text" name="company" style="display:none" tabindex="-1" autocomplete="off">
-                        <button class="btn primary" type="submit">Send Message</button>
-                        <div class="hint">We’ll never share your details. You’ll also get a copy of your message by email.</div>
+                        <input type="text" name="company" style="display:none" tabindex="-1" autocomplete="off" />
+
+                        <div class="submit-row">
+                            <button class="btn primary" type="submit">Send Message</button>
+                            <span class="hint">We’ll never share your details. You’ll also get a copy by email.</span>
+                        </div>
                     </form>
 
-                    <!-- Replace src with your map or coordinates if you prefer -->
-                    <iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                        src="https://www.google.com/maps?q=0.288835138082504,32.6322174072266&z=15&output=embed"></iframe>
+                    <!-- Map card -->
+                    <div class="map-card">
+                        <div class="map-head">
+                            <div>
+                                <strong>Find us</strong>
+                                <div class="muted">0.288835, 32.632217 • Open 7:00am – 9:30pm</div>
+                            </div>
+                            <a class="btn mini" href="https://www.google.com/maps/search/?api=1&query=0.288835138082504,32.6322174072266" target="_blank" rel="noopener">Open in Maps</a>
+                        </div>
+                        <iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps?q=0.288835138082504,32.6322174072266&z=15&output=embed"></iframe>
+                    </div>
                 </div>
             </div>
         </section>
+
     </main>
 
     <footer>
@@ -1478,6 +1717,16 @@
             left: 300,
             behavior: 'smooth'
         }));
+
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                [...this.querySelectorAll('input[required],textarea[required]')].forEach(el => {
+                    el.classList.toggle('invalid', !el.checkValidity());
+                });
+                alert('Please fill in the required fields correctly.');
+            }
+        });
     </script>
 </body>
 

@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
     <!-- Favicon (placeholder) -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230ea5e9'/%3E%3Ctext x='50' y='58' font-size='58' text-anchor='middle' fill='white' font-family='Arial, Helvetica, sans-serif'%3EA%3C/text%3E%3C/svg%3E" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23f97316'/%3E%3Ctext x='50' y='58' font-size='58' text-anchor='middle' fill='white' font-family='Arial, Helvetica, sans-serif'%3EA%3C/text%3E%3C/svg%3E" />
 
     <style>
         :root {
@@ -45,7 +45,7 @@
             padding: 0;
             font-family: 'Inter', system-ui, Segoe UI, Roboto, Arial, sans-serif;
             color: var(--ink);
-            background: var(--bg)
+            background: linear-gradient(180deg, #fafafa 0%, #ffffff 40%, #fff7ed 100%);
         }
 
         a {
@@ -61,7 +61,7 @@
         .container {
             max-width: 1180px;
             margin: 0 auto;
-            padding: 0 16px
+            padding: 0 20px
         }
 
         /* Header */
@@ -88,8 +88,8 @@
         }
 
         .brand img.logo {
-            height: 40px;
-            width: 40px;
+            height: 44px;
+            width: 44px;
             border-radius: 12px;
             box-shadow: 0 6px 16px rgba(2, 132, 199, .25)
         }
@@ -135,11 +135,6 @@
             box-shadow: 0 10px 28px rgba(0, 0, 0, .08)
         }
 
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(2, 132, 199, .18)
-        }
-
         .btn.primary {
             background: var(--brand);
             border-color: var(--brand);
@@ -170,7 +165,9 @@
             position: absolute;
             inset: -20% -10% auto -10%;
             height: 120%;
-            background: radial-gradient(600px 300px at 20% 20%, rgba(249, 115, 22, .18), transparent 60%), radial-gradient(500px 250px at 80% 10%, rgba(16, 185, 129, .18), transparent 60%);
+            background:
+                radial-gradient(600px 300px at 20% 20%, rgba(249, 115, 22, .18), transparent 60%),
+                radial-gradient(500px 250px at 80% 10%, rgba(16, 185, 129, .18), transparent 60%);
             filter: blur(10px);
             z-index: 0
         }
@@ -183,22 +180,22 @@
         .hero .inner {
             display: grid;
             grid-template-columns: 1.1fr .9fr;
-            gap: 28px;
+            gap: 24px;
             align-items: center;
-            padding: 54px 0
+            padding: 34px 0 24px
         }
 
         .hero h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 42px;
-            line-height: 1.1;
+            font-size: 44px;
+            line-height: 1.08;
             margin: 0 0 12px
         }
 
         .hero p {
             color: var(--muted);
             font-size: 18px;
-            margin: 0 0 20px
+            margin: 0 0 16px
         }
 
         .badge {
@@ -255,7 +252,11 @@
 
         /* Sections */
         section {
-            padding: 56px 0
+            padding: 40px 0
+        }
+
+        main section:nth-of-type(odd) {
+            background: linear-gradient(180deg, #ffffff 0%, #fefce8 100%)
         }
 
         .section-title {
@@ -272,7 +273,8 @@
         .features {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px
+            gap: 16px;
+            margin-top: 6px
         }
 
         .feature {
@@ -418,7 +420,7 @@
 
         /* Footer */
         footer {
-            padding: 24px 0;
+            padding: 16px 0;
             border-top: 1px solid #eef2f7;
             color: var(--muted);
             font-size: 14px
@@ -454,6 +456,31 @@
                 transform: scale(1);
                 opacity: 1
             }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            background: #111827;
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .18);
+            display: none
+        }
+
+        .toast.show {
+            display: block
+        }
+
+        .toast.ok {
+            background: #065f46
+        }
+
+        .toast.err {
+            background: #7f1d1d
         }
 
         /* Responsive */
@@ -515,7 +542,7 @@
                 <div>
                     <span class="badge shadow-pop">Everyday essentials • Fast service • Friendly prices</span>
                     <h1>Welcome to <span style="color:var(--brand)">ANN RETAIL SHOP</span><br />Your neighbourhood store for all essentials.</h1>
-                    <p>Fresh groceries, home & cleaning, personal care, snacks & beverages, baby needs, and more. Shop in‑store or order by phone / WhatsApp — we deliver around town.</p>
+                    <p>Fresh groceries, home & cleaning, personal care, snacks & beverages, baby needs, and more. Shop in-store or order by phone / WhatsApp — we deliver around town.</p>
                     <div class="row">
                         <a class="btn primary" href="#order">Order on WhatsApp</a>
                         <a class="btn" href="#catalog">Browse Categories</a>
@@ -619,7 +646,7 @@
                     </div>
                     <div class="item card"><img alt="Toothpaste" src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?q=80&w=1200&auto=format&fit=crop">
                         <div class="content"><strong>Toothpaste</strong>
-                            <div>Multi‑buy deal</div>
+                            <div>Multi-buy deal</div>
                         </div>
                     </div>
                 </div>
@@ -646,7 +673,7 @@
         <section>
             <div class="container">
                 <h3 class="section-title">About ANN RETAIL SHOP</h3>
-                <p class="section-desc">We’re proud to serve our community with reliable stock, neat shelves, and a smile. Our mission is simple: make everyday shopping fast and stress‑free.</p>
+                <p class="section-desc">We’re proud to serve our community with reliable stock, neat shelves, and a smile. Our mission is simple: make everyday shopping fast and stress-free.</p>
                 <div class="grid">
                     <div class="card" style="padding:18px">
                         <h4>Customer Reviews</h4>
@@ -708,9 +735,9 @@
                         <div class="hint">We’ll never share your details. You’ll also get a copy of your message by email.</div>
                     </form>
 
-                    <!-- Replace src with your map or coordinates if you prefer -->
+                    <!-- Map at your exact coordinates -->
                     <iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13267.716!2d32.5825!3d0.3476!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z!5e0!3m2!1sen!2sUG!4v1697040000000"></iframe>
+                        src="https://www.google.com/maps?q=0.288835138082504,32.6322174072266&z=15&output=embed"></iframe>
                 </div>
             </div>
         </section>
@@ -722,12 +749,12 @@
             <div class="row">
                 <a class="btn ghost" href="https://wa.me/256746825914" target="_blank" rel="noopener">WhatsApp</a>
                 <a class="btn ghost" href="tel:+256746825914">Call</a>
-                <a class="btn ghost" href="mailto:phillipsein6@gmail.com">Email</a>
+                <a class="btn ghost" href="mailto:sales@annretailshop.philltechs.com">Email</a>
             </div>
         </div>
     </footer>
 
-    <!-- JSON‑LD: LocalBusiness -->
+    <!-- JSON-LD: LocalBusiness -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -736,7 +763,7 @@
             "url": "https://annretailshop.com/",
             "image": "https://images.unsplash.com/photo-1585386959984-a41552231658?q=80&w=1200&auto=format&fit=crop",
             "telephone": "+256746825914",
-            "email": "phillipsein6@gmail.com",
+            "email": "sales@annretailshop.philltechs.com",
             "address": {
                 "@type": "PostalAddress",
                 "addressCountry": "UG"
@@ -748,6 +775,8 @@
             ]
         }
     </script>
+
+    <div id="toast" class="toast">Message sent!</div>
 
     <script>
         // Year
@@ -786,84 +815,20 @@
             threshold: .14
         });
         document.querySelectorAll('.feature,.card,.cta').forEach(el => io.observe(el));
+
+        // Success / error toast after redirect from contact.php
+        const params = new URLSearchParams(location.search);
+        const toast = document.getElementById('toast');
+        if (params.get('ok') === '1') {
+            toast.textContent = 'Thanks! Your message was sent.';
+            toast.className = 'toast ok show';
+            setTimeout(() => toast.classList.remove('show'), 5000);
+        } else if (params.get('ok') === '0') {
+            toast.textContent = 'Sorry, message failed. Please try again or WhatsApp us.';
+            toast.className = 'toast err show';
+            setTimeout(() => toast.classList.remove('show'), 7000);
+        }
     </script>
 </body>
 
 </html>
-
-<!-- =========================
-     contact.php (place at your web root)
-     - Handles the contact form and emails the message to phillipsein6@gmail.com
-     - Requires PHP 7.4+ (Hostinger is OK). Uses built‑in mail() or PHPMailer (recommended).
-   ========================= -->
-<?php /*
-<?php
-// contact.php — basic, secure handler
-// Update these:
-$TO_EMAILS = ['phillipsein6@gmail.com','nabukeeraannet2@gmail.com'];
-$FROM_EMAIL = 'no-reply@annretailshop.com'; // Set this to an email on your domain (improves deliverability)
-$SITE_NAME  = 'ANN RETAIL SHOP';
-
-// Simple rate limit + spam trap
-session_start();
-if (!empty($_POST['company'])) { http_response_code(400); exit('Bad request'); } // honeypot
-if (isset($_SESSION['last_submit']) && time() - $_SESSION['last_submit'] < 20) { http_response_code(429); exit('Too many requests, try later.'); }
-$_SESSION['last_submit'] = time();
-
-// Validate
-$name    = trim($_POST['name'] ?? '');
-$email   = trim($_POST['email'] ?? '');
-$phone   = trim($_POST['phone'] ?? '');
-$message = trim($_POST['message'] ?? '');
-if (!$name || !filter_var($email, FILTER_VALIDATE_EMAIL) || !$message) {
-  http_response_code(400); exit('Invalid input');
-}
-
-$subject = "New inquiry from $SITE_NAME website";
-$body    = "Name: $name\nEmail: $email\nPhone: $phone\n\nMessage:\n$message\n\n--\n$SITE_NAME";
-$headers = [
-  'From' => "$SITE_NAME <$FROM_EMAIL>",
-  'Reply-To' => $email,
-  'Content-Type' => 'text/plain; charset=UTF-8'
-];
-
-// Option A: native mail()
-$okAll = true;
-foreach ($TO_EMAILS as $rcpt) {
-  $okAll = mail($rcpt, $subject, $body, $headers) && $okAll;
-}
-$ok = $okAll;
-
-// Option B (recommended): PHPMailer with Titan/SMTP
-// Uncomment and configure if you use Titan Email/Hostinger SMTP for higher deliverability.
-/*
-use PHPMailer\PHPMailer\PHPMailer; use PHPMailer\PHPMailer\SMTP; use PHPMailer\PHPMailer\Exception;
-require __DIR__.'/vendor/autoload.php';
-$mail = new PHPMailer(true);
-try {
-  $mail->isSMTP();
-  $mail->Host = 'smtp.titan.email';
-  $mail->SMTPAuth = true;
-  $mail->Username = 'no-reply@annretailshop.com'; // mailbox on your domain
-  $mail->Password = 'YOUR_SMTP_PASSWORD';
-  $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-  $mail->Port = 587;
-  $mail->setFrom('no-reply@annretailshop.com', $SITE_NAME);
-  $mail->addAddress('phillipsein6@gmail.com');
-  $mail->addAddress('nabukeeraannet2@gmail.com');
-  $mail->addReplyTo($email, $name);
-  $mail->Subject = $subject;
-  $mail->Body    = $body;
-  $ok = $mail->send();
-} catch (Exception $e) { $ok=false; }
-*/
-
-// Redirect back with status
-if ($ok) {
-    header('Location: /?ok=1#contact');
-} else {
-    header('Location: /?ok=0#contact');
-}
-exit;
-?>
-*/ ?>

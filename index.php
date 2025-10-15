@@ -652,7 +652,7 @@
                     <button class="icon-btn" id="nextBtn" aria-label="Next">▶</button>
                 </div>
                 <div class="track" id="track">
-                    <div class="item card"><img alt="Cooking oil" src="https://images.unsplash.com/photo-1517260739337-6799d878efca?q=80&w=1200&auto=format&fit=crop">
+                    <div class="item card"><img alt="Cooking oil" src="https://www.bing.com/images/search?view=detailV2&ccid=Vb6TWQ2S&id=41DF2DD20D50BE8361169A06F79DFB6B99FA28F1&thid=OIP.Vb6TWQ2SWehsN3AwseeCWwAAAA&mediaurl=https%3a%2f%2fug.jumia.is%2funsafe%2ffit-in%2f300x300%2ffilters%3afill(white)%2fproduct%2f38%2f99528%2f1.jpg%3f3654&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.55be93590d9259e86c377030b1e7825b%3frik%3d8Sj6mWv7nfcGmg%26pid%3dImgRaw%26r%3d0&exph=300&expw=300&q=cooking+oil+3l+uganda&FORM=IRPRST&ck=019632B90A213FB27286EEE842EA77CD&selectedIndex=2&itb=0">
                         <div class="content"><strong>Cooking Oil 3L</strong>
                             <div>Promo price • while stocks last</div>
                         </div>

@@ -742,7 +742,7 @@
                         </div>
                         <div class="field">
                             <label for="name">Your name</label>
-                            <input id="name" name="name" type="text" required placeholder="Jane Doe" />
+                            <input id="name" name="name" type="text" required placeholder="Name Here" />
                         </div>
                         <div class="field">
                             <label for="email">Email</label>

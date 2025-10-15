@@ -738,7 +738,6 @@
                         <div class="row" style="margin-bottom:10px">
                             <span class="tag">Call: +256 746 825 914</span>
                             <span class="tag">Call: +256 781 988 570</span>
-                            <span class="tag">Email: phillipsein6@gmail.com</span>
                             <span class="tag">Email: nabukeeraannet2@gmail.com</span>
                         </div>
                         <div class="field">

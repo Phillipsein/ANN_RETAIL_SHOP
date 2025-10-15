@@ -91,7 +91,7 @@
             height: 40px;
             width: 40px;
             border-radius: 12px;
-            box-shadow: 0 6px 16px rgba(2, 132, 199, .25)
+            /* box-shadow: 0 6px 16px rgba(2, 132, 199, .25) */
         }
 
         .brand .name {

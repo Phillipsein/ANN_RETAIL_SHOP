@@ -883,6 +883,154 @@
             fill: none;
             stroke-width: 2
         }
+
+        /* === Beautiful Categories & Best-Sellers === */
+        .section-title {
+            font-size: 26px;
+            margin: 0 0 6px
+        }
+
+        .section-desc {
+            color: var(--muted);
+            margin: 0 0 16px
+        }
+
+        /* Unified card look */
+        .card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid #eef2f7;
+            background: var(--card);
+            box-shadow: 0 10px 28px rgba(15, 23, 42, .06);
+            transition: .25s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, .12)
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .35s ease
+        }
+
+        /* Category grid: 4:5 portrait tiles (good for shelves) */
+        .grid {
+            display: grid;
+            gap: 14px;
+            grid-template-columns: repeat(4, 1fr)
+        }
+
+        .grid .card {
+            aspect-ratio: 4/5
+        }
+
+        @media (max-width: 960px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        /* Overlay content */
+        .card .content {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 12px 14px;
+            color: #fff;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, .72) 100%);
+        }
+
+        .card strong {
+            font-size: 16px
+        }
+
+        .card .content div {
+            opacity: .9;
+            font-size: 13px
+        }
+
+        /* Fancy corner tag on categories */
+        .cat-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            background: linear-gradient(90deg, var(--brand), var(--accent));
+            color: #fff;
+            font-weight: 800;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .15)
+        }
+
+        /* Subtle zoom on image */
+        .card:hover img {
+            transform: scale(1.05)
+        }
+
+        /* Carousel container */
+        .carousel {
+            position: relative
+        }
+
+        .carousel .nav {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin: -6px 0 8px
+        }
+
+        .icon-btn {
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: var(--ink);
+            padding: 8px 10px;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, .08);
+            font-weight: 800
+        }
+
+        .track {
+            display: flex;
+            gap: 14px;
+            overflow: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 6px
+        }
+
+        .track .item {
+            min-width: 260px;
+            max-width: 280px;
+            scroll-snap-align: start
+        }
+
+        .track .item.card {
+            aspect-ratio: 1/1
+        }
+
+        /* square product tiles */
+
+        /* Little “price/offer” badge for best sellers */
+        .offer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+            background: #fff;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 12px
+        }
     </style>
 </head>
 
@@ -1013,23 +1161,39 @@
             <div class="container">
                 <h3 class="section-title">Popular categories</h3>
                 <p class="section-desc">A quick look at our most requested items.</p>
+
                 <div class="grid">
-                    <a class="card" href="#order"><img alt="Groceries" src="https://tse3.mm.bing.net/th/id/OIP.Liols46qTt5HfXKIHJXHVAAAAA?cb=12&w=450&h=800&rs=1&pid=ImgDetMain&o=7&rm=3">
+                    <a class="card" href="#order">
+                        <span class="cat-badge">Groceries</span>
+                        <img alt="Groceries" loading="lazy" decoding="async"
+                            src="https://tse3.mm.bing.net/th/id/OIP.Liols46qTt5HfXKIHJXHVAAAAA?cb=12&w=450&h=800&rs=1&pid=ImgDetMain&o=7&rm=3">
                         <div class="content"><strong>Groceries</strong>
                             <div>Rice, flour, sugar, beans…</div>
                         </div>
                     </a>
-                    <a class="card" href="#order"><img alt="Beverages" src="https://i.pinimg.com/originals/5c/a2/65/5ca26537161d6418bb9418ba04bd692d.jpg">
+
+                    <a class="card" href="#order">
+                        <span class="cat-badge">Beverages</span>
+                        <img alt="Beverages" loading="lazy" decoding="async"
+                            src="https://i.pinimg.com/originals/5c/a2/65/5ca26537161d6418bb9418ba04bd692d.jpg">
                         <div class="content"><strong>Beverages</strong>
                             <div>Juice, water, soda, tea…</div>
                         </div>
                     </a>
-                    <a class="card" href="#order"><img alt="Personal care" src="https://images.pond5.com/dollar-general-retail-store-interior-footage-220690764_iconl.jpeg">
+
+                    <a class="card" href="#order">
+                        <span class="cat-badge">Personal Care</span>
+                        <img alt="Personal care" loading="lazy" decoding="async"
+                            src="https://images.pond5.com/dollar-general-retail-store-interior-footage-220690764_iconl.jpeg">
                         <div class="content"><strong>Personal Care</strong>
                             <div>Soaps, toothpaste, lotion…</div>
                         </div>
                     </a>
-                    <a class="card" href="#order"><img alt="Cleaning" src="https://thumbs.dreamstime.com/z/cleaning-products-supermarket-23731231.jpg?w=768">
+
+                    <a class="card" href="#order">
+                        <span class="cat-badge">Home & Cleaning</span>
+                        <img alt="Cleaning" loading="lazy" decoding="async"
+                            src="https://thumbs.dreamstime.com/z/cleaning-products-supermarket-23731231.jpg?w=768">
                         <div class="content"><strong>Home & Cleaning</strong>
                             <div>Detergents, tissues…</div>
                         </div>
@@ -1042,39 +1206,58 @@
         <section>
             <div class="container carousel">
                 <h3 class="section-title">This week's best sellers</h3>
+
                 <div class="nav">
                     <button class="icon-btn" id="prevBtn" aria-label="Previous">◀</button>
                     <button class="icon-btn" id="nextBtn" aria-label="Next">▶</button>
                 </div>
+
                 <div class="track" id="track">
-                    <div class="item card"><img alt="Cooking oil" src="https://ug.jumia.is/unsafe/fit-in/300x300/filters:fill(white)/product/38/99528/1.jpg?3654">
+                    <div class="item card">
+                        <span class="offer">Promo</span>
+                        <img alt="Cooking oil" loading="lazy" decoding="async"
+                            src="https://ug.jumia.is/unsafe/fit-in/300x300/filters:fill(white)/product/38/99528/1.jpg?3654">
                         <div class="content"><strong>Cooking Oil 3L</strong>
                             <div>Promo price • while stocks last</div>
                         </div>
                     </div>
-                    <div class="item card"><img alt="Sugar" src="https://ug.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/72/750331/1.jpg?9730">
+
+                    <div class="item card">
+                        <span class="offer">Hot</span>
+                        <img alt="Sugar" loading="lazy" decoding="async"
+                            src="https://ug.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/72/750331/1.jpg?9730">
                         <div class="content"><strong>Sugar 1kg</strong>
                             <div>High demand</div>
                         </div>
                     </div>
-                    <div class="item card"><img alt="Beans" src="https://totco.co.ug/wp-content/uploads/2023/01/beans.jpg">
+
+                    <div class="item card">
+                        <img alt="Beans" loading="lazy" decoding="async"
+                            src="https://totco.co.ug/wp-content/uploads/2023/01/beans.jpg">
                         <div class="content"><strong>Beans 1kg</strong>
                             <div>Fresh stock</div>
                         </div>
                     </div>
-                    <div class="item card"><img alt="Rice" src="https://tse4.mm.bing.net/th/id/OIP.7V7PgTWVBBzeC9LZNfzbQwHaHa?cb=12&w=700&h=700&rs=1&pid=ImgDetMain&o=7&rm=3">
+
+                    <div class="item card">
+                        <img alt="Rice" loading="lazy" decoding="async"
+                            src="https://tse4.mm.bing.net/th/id/OIP.7V7PgTWVBBzeC9LZNfzbQwHaHa?cb=12&w=700&h=700&rs=1&pid=ImgDetMain&o=7&rm=3">
                         <div class="content"><strong>Rice 5kg</strong>
                             <div>Customer favourite</div>
                         </div>
                     </div>
-                    <div class="item card"><img alt="Toothpaste" src="https://tse1.mm.bing.net/th/id/OIP.r0cjQFctx3GewO39qSao1gHaHa?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3">
+
+                    <div class="item card">
+                        <img alt="Toothpaste" loading="lazy" decoding="async"
+                            src="https://tse1.mm.bing.net/th/id/OIP.r0cjQFctx3GewO39qSao1gHaHa?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3">
                         <div class="content"><strong>Toothpaste</strong>
-                            <div>Multi‑buy deal</div>
+                            <div>Multi-buy deal</div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
 
         <!-- CTA strip -->
         <section>
@@ -1286,6 +1469,15 @@
             threshold: .14
         });
         document.querySelectorAll('.feature,.card,.cta').forEach(el => io.observe(el));
+
+        document.getElementById('prevBtn').addEventListener('click', () => track.scrollBy({
+            left: -300,
+            behavior: 'smooth'
+        }));
+        document.getElementById('nextBtn').addEventListener('click', () => track.scrollBy({
+            left: 300,
+            behavior: 'smooth'
+        }));
     </script>
 </body>
 

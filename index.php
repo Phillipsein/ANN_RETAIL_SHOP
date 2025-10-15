@@ -87,11 +87,60 @@
             align-items: center
         }
 
-        .brand img.logo {
-            height: 40px;
+        .logo-wrap {
+            position: relative;
+            height: 80px;
+            /* increase size */
             width: 80px;
-            border-radius: 12px;
-            /* box-shadow: 0 6px 16px rgba(2, 132, 199, .25) */
+            border-radius: 22px;
+            padding: 4px;
+            background: conic-gradient(from 180deg at 50% 50%, #f97316, #10b981, #f97316);
+            box-shadow: 0 10px 24px rgba(249, 115, 22, .18), inset 0 0 0 1px rgba(255, 255, 255, .6);
+        }
+
+        .logo-wrap .inner {
+            border-radius: 18px;
+            background: #fff;
+            height: 100%;
+            width: 100%;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .logo-wrap .inner img {
+            height: 100%;
+            width: 100%;
+            object-fit: contain;
+            /* ensures full logo visible */
+        }
+
+        .brand .name {
+            font-weight: 900;
+            font-size: 22px;
+            letter-spacing: .2px;
+            line-height: 1.1;
+        }
+
+        .brand .name .grad {
+            background: linear-gradient(90deg, #f97316, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .brand .subline {
+            font-size: 13px;
+            color: #065f46;
+            margin-top: 4px;
+        }
+
+        @media (min-width: 960px) {
+            .logo-wrap {
+                height: 90px;
+                width: 90px;
+                border-radius: 26px;
+            }
         }
 
         .brand .name {
